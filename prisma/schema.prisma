@@ -1,0 +1,205 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────────────
+
+enum AssetType {
+  system
+  schema
+  table
+  column
+}
+
+enum KnowledgeItemType {
+  business_rule
+  warning
+  deprecation
+  calculation_logic
+}
+
+enum KnowledgeStatus {
+  draft
+  review
+  approved
+  rejected
+}
+
+enum UserRole {
+  admin
+  owner
+  contributor
+  viewer
+}
+
+// ──────────────────────────────────────────────────
+// Core: UserProfile
+// ──────────────────────────────────────────────────
+
+model UserProfile {
+  id          String   @id @default(uuid()) @db.Uuid
+  email       String   @unique
+  displayName String   @map("display_name")
+  avatarUrl   String?  @map("avatar_url")
+  role        UserRole @default(viewer)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  ownedAssets     DataAsset[]     @relation("AssetOwner")
+  knowledgeItems  KnowledgeItem[] @relation("KnowledgeAuthor")
+  reviewedItems   KnowledgeItem[] @relation("KnowledgeReviewer")
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+
+  @@map("user_profiles")
+}
+
+// ──────────────────────────────────────────────────
+// Core: DataAsset (System / Schema / Table / Column)
+// ──────────────────────────────────────────────────
+
+model DataAsset {
+  id          String    @id @default(uuid()) @db.Uuid
+  assetType   AssetType @map("asset_type")
+  systemName  String    @map("system_name")
+  schemaName  String?   @map("schema_name")
+  tableName   String?   @map("table_name")
+  columnName  String?   @map("column_name")
+  dataType    String?   @map("data_type")
+  description String?
+  hebrewName  String?   @map("hebrew_name")
+  rawMetadata Json?     @map("raw_metadata")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  parentId String?    @map("parent_id") @db.Uuid
+  parent   DataAsset? @relation("AssetHierarchy", fields: [parentId], references: [id])
+  children DataAsset[] @relation("AssetHierarchy")
+
+  ownerId String?      @map("owner_id") @db.Uuid
+  owner   UserProfile? @relation("AssetOwner", fields: [ownerId], references: [id])
+
+  knowledgeItems KnowledgeItem[]
+  aiInsights     AIInsight[]
+
+  @@unique([systemName, schemaName, tableName, columnName], name: "unique_asset_path")
+  @@index([assetType])
+  @@index([systemName])
+  @@map("data_assets")
+}
+
+// ──────────────────────────────────────────────────
+// Core: KnowledgeItem
+// ──────────────────────────────────────────────────
+
+model KnowledgeItem {
+  id              String            @id @default(uuid()) @db.Uuid
+  itemType        KnowledgeItemType @map("item_type")
+  status          KnowledgeStatus   @default(draft)
+  title           String
+  contentHebrew   String?           @map("content_hebrew")
+  contentEnglish  String?           @map("content_english")
+  sourceProvenance Json?            @map("source_provenance")
+  verifiedAt      DateTime?         @map("verified_at")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  dataAssetId String    @map("data_asset_id") @db.Uuid
+  dataAsset   DataAsset @relation(fields: [dataAssetId], references: [id], onDelete: Cascade)
+
+  authorId String      @map("author_id") @db.Uuid
+  author   UserProfile @relation("KnowledgeAuthor", fields: [authorId], references: [id])
+
+  reviewerId String?      @map("reviewer_id") @db.Uuid
+  reviewer   UserProfile? @relation("KnowledgeReviewer", fields: [reviewerId], references: [id])
+
+  referencedByInsights AIInsightSource[]
+
+  @@index([dataAssetId])
+  @@index([status])
+  @@index([itemType])
+  @@map("knowledge_items")
+}
+
+// ──────────────────────────────────────────────────
+// Core: AIInsight
+// ──────────────────────────────────────────────────
+
+model AIInsight {
+  id              String   @id @default(uuid()) @db.Uuid
+  synthesis       String
+  confidenceScore Float    @map("confidence_score")
+  modelVersion    String   @map("model_version")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  dataAssetId String    @map("data_asset_id") @db.Uuid
+  dataAsset   DataAsset @relation(fields: [dataAssetId], references: [id], onDelete: Cascade)
+
+  sourceReferences AIInsightSource[]
+
+  @@index([dataAssetId])
+  @@map("ai_insights")
+}
+
+model AIInsightSource {
+  insightId       String        @map("insight_id") @db.Uuid
+  insight         AIInsight     @relation(fields: [insightId], references: [id], onDelete: Cascade)
+
+  knowledgeItemId String        @map("knowledge_item_id") @db.Uuid
+  knowledgeItem   KnowledgeItem @relation(fields: [knowledgeItemId], references: [id], onDelete: Cascade)
+
+  @@id([insightId, knowledgeItemId])
+  @@map("ai_insight_sources")
+}
+
+// ──────────────────────────────────────────────────
+// Core: AuditLog (Immutable)
+// ──────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  entityId   String   @map("entity_id") @db.Uuid
+  entityType String   @map("entity_type")
+  action     String
+  oldValue   Json?    @map("old_value")
+  newValue   Json?    @map("new_value")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  userId String      @map("user_id") @db.Uuid
+  user   UserProfile @relation(fields: [userId], references: [id])
+
+  @@index([entityId])
+  @@index([entityType])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ──────────────────────────────────────────────────
+// Notification
+// ──────────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  type      String
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userId String      @map("user_id") @db.Uuid
+  user   UserProfile @relation(fields: [userId], references: [id])
+
+  @@index([userId, read])
+  @@index([createdAt])
+  @@map("notifications")
+}
