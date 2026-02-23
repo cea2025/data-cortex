@@ -15,7 +15,6 @@ import { upvoteKnowledgeItem } from "@/app/actions/rules";
 import { forceApproveKnowledgeItem } from "@/app/actions/knowledge";
 import { useUserRole } from "@/lib/org-context";
 import { toast } from "sonner";
-import styles from "./KnowledgeItemCard.module.css";
 
 interface KnowledgeItemProps {
   item: {
@@ -62,20 +61,20 @@ function KnowledgeItemCard({ item }: KnowledgeItemProps) {
   const showForceApprove = isAdmin && item.status !== "approved";
 
   const cardClass = item.isCanonical
-    ? `${styles.card} ${styles.canonicalCard}`
-    : styles.card;
+    ? "border-r-2 border-r-teal-500 bg-teal-50/50 dark:bg-teal-950/20"
+    : "border-r-2 border-r-transparent";
 
   return (
     <Card className={cardClass}>
-      <CardHeader className={styles.header}>
-        <div className={styles.headerRow}>
-          <div className={styles.badgesRow}>
-            <Badge variant="outline" className={styles.badge}>
+      <CardHeader className="pb-2 gap-1">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
               {KNOWLEDGE_TYPE_LABELS[item.itemType as KnowledgeItemType]}
             </Badge>
             <ReviewBadge status={item.status} />
             {item.isCanonical && (
-              <Badge className={styles.canonicalBadge}>
+              <Badge className="bg-teal-600 text-white hover:bg-teal-700 text-[10px] px-1.5 py-0">
                 <Crown size={10} />
                 <span className="body-tiny-bold" style={{ marginInlineStart: "2px" }}>הגדרה רשמית</span>
               </Badge>
@@ -96,20 +95,20 @@ function KnowledgeItemCard({ item }: KnowledgeItemProps) {
             }
           />
         </div>
-        <h4 className={styles.title}>{item.title}</h4>
+        <h4 className="text-sm font-semibold leading-tight">{item.title}</h4>
       </CardHeader>
-      <CardContent className={styles.content}>
+      <CardContent className="pt-0 pb-3 space-y-3">
         {item.contentHebrew && (
-          <div className={styles.markdown}>
+          <div className="prose prose-sm prose-rtl dark:prose-invert max-w-none prose-pre:bg-navy-950 prose-pre:text-teal-300 prose-code:text-teal-600">
             <Markdown>{item.contentHebrew}</Markdown>
           </div>
         )}
         {item.contentEnglish && (
-          <div className={`${styles.markdown} ${styles.markdownLtr}`}>
+          <div className="prose prose-sm prose-rtl prose-ltr dark:prose-invert max-w-none prose-pre:bg-navy-950 prose-pre:text-teal-300 prose-code:text-teal-600" dir="ltr">
             <Markdown>{item.contentEnglish}</Markdown>
           </div>
         )}
-        <div className={styles.footer}>
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <ProvenanceTag
             provenance={item.sourceProvenance}
             author={item.author}
@@ -117,7 +116,7 @@ function KnowledgeItemCard({ item }: KnowledgeItemProps) {
           <div className="flex items-center gap-1.5">
             {showForceApprove && (
               <button
-                className={`${styles.upvoteBtn} body-small-semibold`}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-sm hover:bg-teal-50 hover:text-teal-600 hover:border-teal-300 transition-colors body-small-semibold"
                 onClick={handleForceApprove}
                 disabled={isPending}
                 title="אישור ישיר (מנהל)"
@@ -126,7 +125,7 @@ function KnowledgeItemCard({ item }: KnowledgeItemProps) {
               </button>
             )}
             <button
-              className={`${styles.upvoteBtn} body-small-semibold`}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-sm hover:bg-teal-50 hover:text-teal-600 hover:border-teal-300 transition-colors body-small-semibold"
               onClick={handleUpvote}
               disabled={isPending}
             >

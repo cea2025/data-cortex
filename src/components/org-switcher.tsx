@@ -12,7 +12,6 @@ import {
 import { Building2 } from "lucide-react";
 import { useOrgSlug } from "@/lib/org-context";
 import { getAllOrganizations } from "@/lib/org";
-import styles from "./OrgSwitcher.module.css";
 
 interface OrgOption {
   id: string;
@@ -33,7 +32,7 @@ function OrgSwitcher() {
   if (orgs.length <= 1) return null;
 
   return (
-    <div className={styles.wrapper}>
+    <div className="px-2 py-2">
       <Select
         value={currentSlug}
         onValueChange={(slug) => {
@@ -42,8 +41,8 @@ function OrgSwitcher() {
           });
         }}
       >
-        <SelectTrigger className={styles.trigger}>
-          <Building2 className={styles.triggerIcon} />
+        <SelectTrigger className="h-8 gap-2 text-xs">
+          <Building2 className="h-3.5 w-3.5 shrink-0" />
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

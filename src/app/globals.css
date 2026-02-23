@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -11,6 +12,53 @@
   --color-warning-foreground: oklch(0.2 0 0);
   --color-success: oklch(0.72 0.19 149);
   --color-success-foreground: oklch(0.2 0 0);
+
+  /* Navy palette */
+  --color-navy-50: #f0f3ff;
+  --color-navy-100: #dce3ff;
+  --color-navy-200: #b6c5ff;
+  --color-navy-300: #8ba3ff;
+  --color-navy-400: #5c7cff;
+  --color-navy-500: #3355ff;
+  --color-navy-600: #1a3a8f;
+  --color-navy-700: #142d6e;
+  --color-navy-800: #0f2150;
+  --color-navy-900: #0a1836;
+  --color-navy-950: #060e20;
+
+  /* Teal palette */
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-200: #99f6e4;
+  --color-teal-300: #5eead4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+  --color-teal-800: #115e59;
+  --color-teal-900: #134e4a;
+  --color-teal-950: #042f2e;
+
+  /* Gold palette */
+  --color-gold-50: #fffbeb;
+  --color-gold-100: #fef3c7;
+  --color-gold-200: #fde68a;
+  --color-gold-300: #fcd34d;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+  --color-gold-700: #b45309;
+  --color-gold-800: #92400e;
+  --color-gold-900: #78350f;
+  --color-gold-950: #451a03;
+
+  /* Cream palette */
+  --color-cream-50: #fefdfb;
+  --color-cream-100: #fdf8f0;
+  --color-cream-200: #faf0e0;
+  --color-cream-300: #f5e6cc;
+  --color-cream-400: #edd5ad;
+  --color-cream-500: #e4c48e;
 }
 
 @layer base {

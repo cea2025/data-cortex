@@ -19,7 +19,6 @@ import { useOrgSlug } from "@/lib/org-context";
 import { RELATIONSHIP_TYPE_LABELS } from "@/types/domain";
 import type { RelationshipType, AssetRelationshipWithDetails } from "@/types/domain";
 import { Database, Table2, Columns3, GitBranch, Loader2 } from "lucide-react";
-import styles from "./LineageGraph.module.css";
 
 const ASSET_ICONS: Record<string, typeof Database> = {
   system: Database,
@@ -31,15 +30,19 @@ const ASSET_ICONS: Record<string, typeof Database> = {
 function AssetNode({ data }: { data: { label: string; assetType: string; sublabel?: string } }) {
   const Icon = ASSET_ICONS[data.assetType] ?? Database;
   return (
-    <div className={styles.node}>
+    <div className="px-4 py-3 rounded-xl border-2 border-navy-300 bg-white shadow-lg dark:bg-navy-900 dark:border-navy-600 min-w-[160px]">
       <Handle type="target" position={Position.Left} />
-      <div className={styles.nodeIcon}>
-        <Icon size={14} />
+      <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center h-6 w-6 rounded-lg bg-teal-100 text-teal-600 dark:bg-teal-900 dark:text-teal-400">
+          <Icon size={14} />
+        </div>
+        <div>
+          <div className="font-semibold text-sm" dir="ltr">{data.label}</div>
+          {data.sublabel && (
+            <div className="text-[10px] text-muted-foreground mt-0.5">{data.sublabel}</div>
+          )}
+        </div>
       </div>
-      <div className={`${styles.nodeLabel} body-small-semibold`}>{data.label}</div>
-      {data.sublabel && (
-        <div className={`${styles.nodeType} body-tiny-regular`}>{data.sublabel}</div>
-      )}
       <Handle type="source" position={Position.Right} />
     </div>
   );
@@ -47,11 +50,11 @@ function AssetNode({ data }: { data: { label: string; assetType: string; sublabe
 
 function CentralNode({ data }: { data: { label: string; sublabel?: string } }) {
   return (
-    <div className={styles.centralNode}>
+    <div className="px-5 py-4 rounded-2xl border-2 border-teal-500 bg-gradient-to-br from-teal-50 to-navy-50 shadow-xl dark:from-teal-950/30 dark:to-navy-950 dark:border-teal-600 min-w-[180px]">
       <Handle type="target" position={Position.Left} />
-      <div className={`${styles.centralLabel} body-medium-semibold`}>{data.label}</div>
+      <div className="font-bold text-base text-navy-800 dark:text-white">{data.label}</div>
       {data.sublabel && (
-        <div className={`${styles.centralSubLabel} body-tiny-regular`}>{data.sublabel}</div>
+        <div className="text-xs text-teal-600 dark:text-teal-400">{data.sublabel}</div>
       )}
       <Handle type="source" position={Position.Right} />
     </div>
@@ -184,7 +187,7 @@ function LineageGraph({ assetId, assetLabel }: LineageGraphProps) {
 
   if (loading) {
     return (
-      <div className={styles.loading}>
+      <div className="flex items-center justify-center py-16 text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" />
         <span className="body-small-regular" style={{ marginInlineStart: "var(--space-sm)" }}>
           טוען גרף...
@@ -197,8 +200,8 @@ function LineageGraph({ assetId, assetLabel }: LineageGraphProps) {
 
   if (totalRelationships === 0) {
     return (
-      <div className={styles.emptyState}>
-        <GitBranch size={40} className={styles.emptyIcon} />
+      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
+        <GitBranch size={40} className="opacity-20" />
         <p className="body-medium-regular">אין קשרים מוגדרים לנכס זה</p>
         <p className="body-small-regular">הוסיפו קשרים בלשונית ״קשרי גומלין״ כדי לראות גרף ויזואלי</p>
       </div>
@@ -206,8 +209,8 @@ function LineageGraph({ assetId, assetLabel }: LineageGraphProps) {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.graphWrapper}>
+    <div className="flex flex-col h-full">
+      <div className="flex-1 min-h-0">
         <ReactFlow
           nodes={nodes}
           edges={edges}

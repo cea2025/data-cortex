@@ -3,7 +3,6 @@ import { getPendingReviews } from "@/app/actions/knowledge";
 import { getCurrentUser } from "@/lib/auth";
 import NotificationsList from "@/components/notifications-list";
 import ReviewDashboard from "@/components/knowledge/review-dashboard";
-import styles from "./NotificationsPage.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -27,13 +26,13 @@ export default async function NotificationsPage({
   ]);
 
   return (
-    <div className={styles.container} dir="rtl">
+    <div className="p-6 max-w-3xl mx-auto flex flex-col gap-8" dir="rtl">
       <section>
         <ReviewDashboard items={pendingItems} />
       </section>
 
       <section>
-        <h2 className={styles.sectionTitle}>התראות</h2>
+        <h2 className="heading-h3-bold mb-4">התראות</h2>
         <NotificationsList notifications={notifications} />
       </section>
     </div>

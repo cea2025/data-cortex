@@ -24,7 +24,6 @@ import { ASSET_TYPE_LABELS } from "@/types/domain";
 import type { AssetType } from "@/types/domain";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
 import { useOrgSlug } from "@/lib/org-context";
-import styles from "./ContextInspector.module.css";
 
 const typeIcons: Record<AssetType, typeof Server> = {
   system: Server,
@@ -47,9 +46,9 @@ function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
     asset.knowledgeItems.length + (asset.childKnowledgeItems?.length ?? 0);
 
   return (
-    <div className={styles.container}>
+    <div className="flex flex-col h-full">
       {/* Header Bar */}
-      <div className={styles.headerBar}>
+      <div className="flex items-center gap-3 px-4 py-3 border-b bg-white dark:bg-navy-950">
         <Link href={`/${orgSlug}/`}>
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <ArrowRight className="h-4 w-4" />
@@ -57,7 +56,7 @@ function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
         </Link>
 
         <div className="flex items-center gap-2.5">
-          <div className={styles.typeIconContainer}>
+          <div className="flex items-center justify-center h-8 w-8 rounded-xl bg-navy-100 text-navy-600 dark:bg-navy-900 dark:text-navy-300">
             <TypeIcon className="h-4 w-4" />
           </div>
           <div className="min-w-0">
@@ -77,7 +76,7 @@ function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
           </div>
         </div>
 
-        <div className={styles.autoMargin}>
+        <div className="mr-auto flex items-center gap-2">
           {knowledgeCount > 0 && (
             <Badge variant="secondary" className="gap-1 text-xs">
               {knowledgeCount} פריטי ידע
@@ -98,7 +97,7 @@ function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
         >
           <Search className="h-3.5 w-3.5" />
           <span>חיפוש</span>
-          <kbd className={styles.searchKbd}>
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border bg-muted px-1 font-mono text-[10px] text-muted-foreground">
             Ctrl+K
           </kbd>
         </Button>

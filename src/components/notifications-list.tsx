@@ -13,7 +13,6 @@ import {
 } from "@/app/actions/notifications";
 import { useOrgSlug } from "@/lib/org-context";
 import { toast } from "sonner";
-import styles from "./NotificationsList.module.css";
 
 interface Notification {
   id: string;
@@ -46,8 +45,8 @@ function NotificationsList({
 
   if (notifications.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <Bell className={styles.emptyIcon} />
+      <div className="text-center py-12 text-muted-foreground">
+        <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
         <p>אין התראות חדשות</p>
       </div>
     );
@@ -56,8 +55,8 @@ function NotificationsList({
   return (
     <div className="space-y-3">
       {unreadCount > 0 && (
-        <div className={styles.unreadRow}>
-          <span className={styles.unreadLabel}>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">
             {unreadCount} התראות שלא נקראו
           </span>
           <Button
@@ -101,16 +100,16 @@ function NotificationCard({ notification: notif }: { notification: Notification 
   const content = (
     <Card
       className={cn(
-        styles.card,
-        !notif.read && styles.cardUnread,
-        notif.link && styles.cardClickable
+        "transition-colors",
+        !notif.read && "border-r-2 border-r-primary bg-primary/5",
+        notif.link && "hover:bg-accent cursor-pointer"
       )}
     >
-      <CardContent className={styles.cardContent}>
+      <CardContent className="p-4 flex items-start gap-3">
         <div
           className={cn(
-            styles.iconWrapper,
-            notif.read ? styles.iconRead : styles.iconUnread
+            "mt-0.5",
+            notif.read ? "text-muted-foreground" : "text-primary"
           )}
         >
           {isPending ? (
@@ -121,12 +120,12 @@ function NotificationCard({ notification: notif }: { notification: Notification 
             <Bell className="h-4 w-4" />
           )}
         </div>
-        <div className={styles.contentBody}>
-          <div className={styles.titleRow}>
-            <p className={cn(styles.title, notif.read && styles.titleRead)}>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className={cn("text-sm font-semibold", notif.read && "text-muted-foreground")}>
               {notif.title}
             </p>
-            <Badge variant="outline" className={styles.badge}>
+            <Badge variant="outline" className="text-xs shrink-0">
               {notif.type === "review_request"
                 ? "בקשת בדיקה"
                 : notif.type === "status_change"
@@ -134,10 +133,10 @@ function NotificationCard({ notification: notif }: { notification: Notification 
                   : notif.type}
             </Badge>
           </div>
-          <p className={styles.message}>
+          <p className="text-sm text-muted-foreground mt-0.5">
             {notif.message}
           </p>
-          <p className={styles.date}>
+          <p className="text-xs text-muted-foreground mt-2">
             {new Date(notif.createdAt).toLocaleDateString("he-IL", {
               year: "numeric",
               month: "short",

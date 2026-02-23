@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import styles from "./SearchPage.module.css";
 import {
   Search,
   Database,
@@ -74,11 +73,11 @@ export default function SearchPage() {
   const knowledge = results.filter(isKnowledge);
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>חיפוש</h1>
+    <div className="p-6 max-w-4xl mx-auto flex flex-col gap-6">
+      <h1 className="heading-h2-bold text-foreground">חיפוש</h1>
 
-      <div className={styles.inputWrapper}>
-        <Search className={styles.searchIcon} />
+      <div className="relative">
+        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <Input
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
@@ -88,28 +87,28 @@ export default function SearchPage() {
       </div>
 
       {isPending && (
-        <p className={styles.pendingText}>
+        <p className="text-sm text-muted-foreground text-center">
           מחפש…
         </p>
       )}
 
       {assets.length > 0 && (
-        <div className={styles.resultsSection}>
-          <h2 className={styles.sectionTitle}>נכסי מידע</h2>
+        <div className="flex flex-col gap-2">
+          <h2 className="heading-h3-bold mb-1">נכסי מידע</h2>
           {assets.map((r) => {
             const Icon = assetIcons[r.type] ?? Database;
             return (
               <Card
                 key={r.id}
-                className={styles.card}
+                className="transition-colors hover:bg-accent/30 cursor-pointer"
                 onClick={() => router.push(`/${orgSlug}/assets/${r.id}`)}
               >
-                <CardContent className={styles.cardContent}>
-                  <div className={styles.iconWrap}>
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
                     <Icon className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <div className={styles.cardBody}>
-                    <div className={styles.cardTitleRow}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
                       <LtrText className="font-medium">{r.title}</LtrText>
                       {r.dataType && (
                         <LtrText className="text-xs text-muted-foreground">
@@ -117,7 +116,7 @@ export default function SearchPage() {
                         </LtrText>
                       )}
                     </div>
-                    <div className={styles.cardSubtitleRow}>
+                    <div className="flex items-center gap-2 mt-0.5">
                       <LtrText className="text-xs text-muted-foreground">
                         {r.subtitle}
                       </LtrText>
@@ -128,7 +127,7 @@ export default function SearchPage() {
                       )}
                     </div>
                   </div>
-                  <div className={styles.cardBadges}>
+                  <div className="flex items-center gap-2 shrink-0">
                     <Badge variant="outline" className="text-xs">
                       {ASSET_TYPE_LABELS[r.type as AssetType]}
                     </Badge>
@@ -147,31 +146,31 @@ export default function SearchPage() {
       )}
 
       {knowledge.length > 0 && (
-        <div className={styles.resultsSectionLast}>
-          <h2 className={styles.sectionTitle}>ידע ארגוני</h2>
+        <div className="flex flex-col gap-2">
+          <h2 className="heading-h3-bold mb-1">ידע ארגוני</h2>
           {knowledge.map((r) => {
             const Icon = knowledgeIcons[r.knowledgeType] ?? BookOpen;
             return (
               <Card
                 key={r.id}
-                className={styles.cardKnowledge}
+                className="transition-colors hover:bg-accent/30 cursor-pointer border-gold-200/50"
                 onClick={() => router.push(`/${orgSlug}/assets/${r.assetId}`)}
               >
-                <CardContent className={styles.cardContent}>
-                  <div className={styles.iconWrapKnowledge}>
-                    <Icon className="h-4 w-4 text-amber-500" />
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gold-100">
+                    <Icon className="h-4 w-4 text-gold-600" />
                   </div>
-                  <div className={styles.cardBody}>
-                    <div className={styles.cardTitleRow}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
                       <span className="font-medium">{r.title}</span>
                       <Badge
                         variant="outline"
-                        className="text-xs border-amber-500/30 text-amber-500"
+                        className="text-xs border-gold-300 text-gold-600"
                       >
                         {KNOWLEDGE_TYPE_LABELS[r.knowledgeType]}
                       </Badge>
                     </div>
-                    <p className={styles.snippet}>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                       {r.snippet}
                     </p>
                     <LtrText className="text-[11px] text-muted-foreground/60 mt-1">
@@ -186,8 +185,8 @@ export default function SearchPage() {
       )}
 
       {query.length >= 2 && !isPending && results.length === 0 && (
-        <div className={styles.emptyState}>
-          <Search className={styles.emptyIcon} />
+        <div className="text-center py-12 text-muted-foreground">
+          <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p>לא נמצאו תוצאות עבור &quot;{query}&quot;</p>
         </div>
       )}

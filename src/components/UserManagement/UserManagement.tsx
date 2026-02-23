@@ -4,14 +4,21 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   approveUser,
   suspendUser,
@@ -30,8 +37,8 @@ import {
   Shield,
   Loader2,
   Sparkles,
+  ChevronDown,
 } from "lucide-react";
-import styles from "./UserManagement.module.css";
 
 interface UserItem {
   id: string;
@@ -116,16 +123,16 @@ function UserManagement({ initialUsers }: Props) {
   };
 
   const renderStatusBadge = (status: string) => {
-    const statusClass =
+    const badgeClass =
       status === "PENDING"
-        ? styles.statusPending
+        ? "bg-gold-100 text-gold-700 border-gold-300"
         : status === "ACTIVE"
-          ? styles.statusActive
-          : styles.statusSuspended;
+          ? "bg-teal-100 text-teal-700 border-teal-300"
+          : "bg-red-100 text-red-700 border-red-300";
     return (
-      <span className={`${styles.statusBadge} ${statusClass}`}>
+      <Badge variant="outline" className={badgeClass}>
         {USER_STATUS_LABELS[status as UserStatus] ?? status}
-      </span>
+      </Badge>
     );
   };
 
@@ -135,8 +142,8 @@ function UserManagement({ initialUsers }: Props) {
   ) => {
     if (users.length === 0) {
       return (
-        <div className={styles.emptyState}>
-          <Users size={32} style={{ margin: "0 auto var(--space-md)", opacity: 0.2 }} />
+        <div className="text-center py-12 text-muted-foreground">
+          <Users size={32} className="mx-auto mb-3 opacity-20" />
           <p className="body-medium-regular">
             {tabType === "pending"
               ? "אין משתמשים ממתינים לאישור"
@@ -149,89 +156,91 @@ function UserManagement({ initialUsers }: Props) {
     }
 
     return (
-      <Card>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th className="body-small-semibold">משתמש</th>
-              <th className="body-small-semibold">אימייל</th>
-              <th className="body-small-semibold">תפקיד</th>
-              <th className="body-small-semibold">סטטוס</th>
-              <th className="body-small-semibold">שימוש AI</th>
-              <th className="body-small-semibold">פעולות</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="rounded-xl border shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="body-small-semibold">משתמש</TableHead>
+              <TableHead className="body-small-semibold">אימייל</TableHead>
+              <TableHead className="body-small-semibold">תפקיד</TableHead>
+              <TableHead className="body-small-semibold">סטטוס</TableHead>
+              <TableHead className="body-small-semibold">שימוש AI</TableHead>
+              <TableHead className="body-small-semibold">פעולות</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {users.map((u) => (
-              <tr key={u.id}>
-                <td>
-                  <div className={styles.userCell}>
+              <TableRow key={u.id}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
                     {u.avatarUrl ? (
                       <img
                         src={u.avatarUrl}
                         alt=""
-                        className={styles.avatar}
+                        className="h-8 w-8 rounded-full"
                       />
                     ) : (
-                      <div className={styles.avatarPlaceholder}>
+                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
                         <span className="body-small-semibold">
                           {u.displayName.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
-                    <div className={styles.userName}>
+                    <div className="flex flex-col">
                       <span className="body-small-semibold">{u.displayName}</span>
                       {u.isSuperAdmin && (
-                        <span className="body-tiny-regular" style={{ color: "var(--font-brand)" }}>
+                        <span className="body-tiny-regular text-teal-600">
                           Super Admin
                         </span>
                       )}
                     </div>
                   </div>
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   <span className="body-small-regular" dir="ltr">
                     {u.email}
                   </span>
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   {u.isSuperAdmin ? (
-                    <span className="body-small-semibold" style={{ color: "var(--font-brand)" }}>
+                    <span className="body-small-semibold text-teal-600">
                       Super Admin
                     </span>
                   ) : (
-                    <Select
-                      defaultValue={u.role}
-                      onValueChange={(val) => handleRoleChange(u.id, val)}
-                      disabled={isPending}
-                    >
-                      <SelectTrigger className="h-8 w-28">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="h-8 gap-1" disabled={isPending}>
+                          {USER_ROLE_LABELS[u.role as UserRole] ?? u.role}
+                          <ChevronDown size={12} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
                         {Object.entries(USER_ROLE_LABELS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>
+                          <DropdownMenuItem
+                            key={key}
+                            onClick={() => handleRoleChange(u.id, key)}
+                          >
                             {label}
-                          </SelectItem>
+                          </DropdownMenuItem>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
-                </td>
-                <td>{renderStatusBadge(u.status)}</td>
-                <td>
-                  <div className={styles.aiUsage}>
-                    <span className="body-small-regular">
-                      <Sparkles size={12} style={{ display: "inline", marginInlineEnd: 4 }} />
+                </TableCell>
+                <TableCell>{renderStatusBadge(u.status)}</TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="body-small-regular inline-flex items-center gap-1">
+                      <Sparkles size={12} className="text-gold-500" />
                       {u.aiCallsCount} קריאות
                     </span>
-                    <span className={`${styles.aiCost} body-tiny-regular`}>
+                    <span className="body-tiny-regular text-muted-foreground">
                       {u.aiTokensUsed.toLocaleString()} tokens ≈ {estimateCost(u.aiTokensUsed)}
                     </span>
                   </div>
-                </td>
-                <td>
-                  <div className={styles.actions}>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
                     {tabType === "pending" && (
                       <Button
                         size="sm"
@@ -284,29 +293,29 @@ function UserManagement({ initialUsers }: Props) {
                       </Button>
                     )}
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </Card>
+          </TableBody>
+        </Table>
+      </div>
     );
   };
 
   return (
-    <div className={styles.container} dir="rtl">
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1 className="heading-h2-bold" style={{ color: "var(--font-primary-default)" }}>
+    <div className="p-6 max-w-5xl mx-auto" dir="rtl">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-1">
+          <h1 className="heading-h2-bold text-foreground">
             ניהול משתמשים
           </h1>
-          <p className="body-medium-regular" style={{ color: "var(--font-secondary-default)" }}>
+          <p className="body-medium-regular text-muted-foreground">
             ניהול הרשאות, אישור גישה ומעקב שימוש AI
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Shield size={20} style={{ color: "var(--font-brand)" }} />
-          <span className="body-small-semibold" style={{ color: "var(--font-brand)" }}>
+          <Shield size={20} className="text-teal-600" />
+          <span className="body-small-semibold text-teal-600">
             {initialUsers.length} משתמשים
           </span>
         </div>

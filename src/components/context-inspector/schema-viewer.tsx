@@ -31,7 +31,6 @@ import {
   getColumnConflictStatus,
   type ConflictStatus,
 } from "@/lib/utils/conflict-resolver";
-import styles from "./SchemaViewer.module.css";
 
 const typeIcons: Record<AssetType, typeof Server> = {
   system: Server,
@@ -77,17 +76,17 @@ function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
 
   return (
     <ScrollArea className="h-full" dir="ltr">
-      <div className={styles.root}>
+      <div className="p-4 space-y-6">
         {/* Metadata Header */}
-        <div className={styles.metaSection}>
-          <div className={styles.metaHeader}>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 pb-2 border-b">
             <TypeIcon className="h-4 w-4 text-primary" />
             <span className="body-xsmall-bold uppercase tracking-wider text-muted-foreground">
               {ASSET_TYPE_LABELS[asset.assetType as AssetType]} Metadata
             </span>
           </div>
 
-          <div className={`${styles.metaGrid} body-small-regular`}>
+          <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 body-small-regular">
             <MetaLabel>System</MetaLabel>
             <LtrText className="body-small-semibold text-foreground">
               {asset.systemName}
@@ -154,9 +153,9 @@ function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
 
         {/* Column Grid (for table assets) */}
         {asset.children && asset.children.length > 0 && (
-          <div className={styles.columnsSection}>
-            <div className={styles.columnsHeader}>
-              <h3 className={styles.columnsTitle}>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-sm font-bold">
                 <Columns3 className="h-4 w-4 text-primary" />
                 Columns
               </h3>
@@ -166,17 +165,17 @@ function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
               </Badge>
             </div>
 
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
+            <div className="rounded-xl border overflow-hidden">
+              <table className="w-full text-sm">
                 <thead>
-                  <tr className={styles.tableHead}>
-                    <th className={`${styles.tableHeader} ${styles.tableHeaderCenter} w-8`} />
-                    <th className={styles.tableHeader}>Column</th>
-                    <th className={styles.tableHeader}>Type</th>
-                    <th className={`${styles.tableHeader} ${styles.tableHeaderRight}`} dir="rtl">
+                  <tr className="bg-muted/50">
+                    <th className="px-3 py-2 text-xs font-semibold text-muted-foreground text-left text-center w-8" />
+                    <th className="px-3 py-2 text-xs font-semibold text-muted-foreground text-left">Column</th>
+                    <th className="px-3 py-2 text-xs font-semibold text-muted-foreground text-left">Type</th>
+                    <th className="px-3 py-2 text-xs font-semibold text-muted-foreground text-left text-right" dir="rtl">
                       שם עברי
                     </th>
-                    <th className={`${styles.tableHeader} ${styles.tableHeaderCenter} w-16`}>
+                    <th className="px-3 py-2 text-xs font-semibold text-muted-foreground text-left text-center w-16">
                       <BookOpen className="h-3.5 w-3.5 mx-auto" />
                     </th>
                   </tr>
@@ -203,11 +202,11 @@ function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
                     return (
                       <tr
                         key={col.id}
-                        className={`${styles.tableRow} group ${
-                          idx % 2 === 0 ? "" : styles.tableRowAlt
+                        className={`border-t transition-colors hover:bg-muted/30 group ${
+                          idx % 2 === 0 ? "" : "bg-muted/10"
                         }`}
                       >
-                        <td className={`${styles.tableCell} ${styles.tableCellCenter}`}>
+                        <td className="px-3 py-2 text-center">
                           {conflict.status !== "empty" && (
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -231,7 +230,7 @@ function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
                             </Tooltip>
                           )}
                         </td>
-                        <td className={styles.tableCell}>
+                        <td className="px-3 py-2">
                           <Link
                             href={`/${orgSlug}/assets/${col.id}`}
                             className="inline-flex items-center gap-1.5 text-primary hover:underline"
@@ -242,17 +241,17 @@ function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
                             <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
                           </Link>
                         </td>
-                        <td className={styles.tableCell}>
+                        <td className="px-3 py-2">
                           <LtrText className="body-xsmall-regular text-teal-500 font-mono">
                             {col.dataType}
                           </LtrText>
                         </td>
-                        <td className={`${styles.tableCell} ${styles.tableCellRight}`} dir="rtl">
+                        <td className="px-3 py-2 text-right" dir="rtl">
                           <span className="body-xsmall-regular text-muted-foreground">
                             {col.hebrewName}
                           </span>
                         </td>
-                        <td className={`${styles.tableCell} ${styles.tableCellCenter}`}>
+                        <td className="px-3 py-2 text-center">
                           {knowledgeCount > 0 && (
                             <Badge
                               variant="secondary"
@@ -273,7 +272,7 @@ function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
 
         {/* Parent breadcrumb */}
         {asset.parent && (
-          <div className={styles.parentBreadcrumb}>
+          <div className="pt-4 border-t">
             <p className="body-xsmall-regular text-muted-foreground" dir="rtl">
               חלק מ:{" "}
               <Link
@@ -295,7 +294,7 @@ function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
 }
 
 function MetaLabel({ children }: { children: React.ReactNode }) {
-  return <span className={styles.metaLabel}>{children}</span>;
+  return <span className="text-xs text-muted-foreground uppercase tracking-wider">{children}</span>;
 }
 
 export default SchemaViewer;

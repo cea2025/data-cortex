@@ -35,7 +35,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import styles from "./RelationshipsTab.module.css";
 
 interface RelationshipsTabProps {
   assetId: string;
@@ -90,17 +89,17 @@ function RelationshipsTab({ assetId, assetLabel }: RelationshipsTabProps) {
   }
 
   return (
-    <div className={`${styles.container} flex flex-col h-full`} dir="rtl">
-      <div className={styles.headerBar}>
+    <div className="flex flex-col h-full" dir="rtl">
+      <div className="flex items-center gap-2 px-4 py-3 border-b">
         <ArrowLeftRight className="h-4 w-4 text-teal-500" />
-        <h2 className={styles.headerTitle}>קשרי גומלין</h2>
+        <h2 className="text-sm font-bold">קשרי גומלין</h2>
         {totalCount > 0 && (
-          <span className={styles.headerCount}>{totalCount} קשרים</span>
+          <span className="text-xs text-muted-foreground">{totalCount} קשרים</span>
         )}
         <Button
           variant="default"
           size="sm"
-          className={`${styles.createBtn} gap-1.5 text-xs`}
+          className="mr-auto gap-1.5 text-xs"
           onClick={() => setDialogOpen(true)}
         >
           <Plus className="h-3.5 w-3.5" />
@@ -109,18 +108,18 @@ function RelationshipsTab({ assetId, assetLabel }: RelationshipsTabProps) {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className={styles.content}>
+        <div className="p-4 space-y-6">
           {/* Outgoing relationships */}
           <section>
-            <div className={styles.sectionHeader}>
+            <div className="flex items-center gap-2 mb-3">
               <ArrowLeftFromLine className="h-3.5 w-3.5 text-blue-500" />
-              <h3 className={styles.sectionTitle}>קשרים יוצאים</h3>
-              <span className={styles.sectionHint}>(נכס זה מצביע אל...)</span>
+              <h3 className="text-xs font-bold uppercase tracking-wider">קשרים יוצאים</h3>
+              <span className="text-xs text-muted-foreground">(נכס זה מצביע אל...)</span>
             </div>
             {outgoing.length === 0 ? (
               <EmptySection label="אין קשרים יוצאים" />
             ) : (
-              <div className={styles.sectionList}>
+              <div className="space-y-2">
                 {outgoing.map((rel) => (
                   <RelationshipCard
                     key={rel.id}
@@ -137,15 +136,15 @@ function RelationshipsTab({ assetId, assetLabel }: RelationshipsTabProps) {
 
           {/* Incoming relationships */}
           <section>
-            <div className={styles.sectionHeader}>
+            <div className="flex items-center gap-2 mb-3">
               <ArrowRightToLine className="h-3.5 w-3.5 text-amber-500" />
-              <h3 className={styles.sectionTitle}>קשרים נכנסים</h3>
-              <span className={styles.sectionHint}>(נכסים המצביעים לכאן...)</span>
+              <h3 className="text-xs font-bold uppercase tracking-wider">קשרים נכנסים</h3>
+              <span className="text-xs text-muted-foreground">(נכסים המצביעים לכאן...)</span>
             </div>
             {incoming.length === 0 ? (
               <EmptySection label="אין קשרים נכנסים" />
             ) : (
-              <div className={styles.sectionList}>
+              <div className="space-y-2">
                 {incoming.map((rel) => (
                   <RelationshipCard
                     key={rel.id}
@@ -177,15 +176,15 @@ function RelationshipsTab({ assetId, assetLabel }: RelationshipsTabProps) {
 }
 
 const typeCardClasses: Record<string, string> = {
-  foreign_key: styles.cardForeignKey,
-  business_flow: styles.cardBusinessFlow,
-  calculated_from: styles.cardCalculatedFrom,
+  foreign_key: "border-l-2 border-l-navy-400",
+  business_flow: "border-l-2 border-l-teal-400",
+  calculated_from: "border-l-2 border-l-gold-400",
 };
 
 const typeBadgeClasses: Record<string, string> = {
-  foreign_key: styles.badgeForeignKey,
-  business_flow: styles.badgeBusinessFlow,
-  calculated_from: styles.badgeCalculatedFrom,
+  foreign_key: "border-navy-300 text-navy-600",
+  business_flow: "border-teal-300 text-teal-600",
+  calculated_from: "border-gold-300 text-gold-600",
 };
 
 function RelationshipCard({
@@ -207,17 +206,17 @@ function RelationshipCard({
     .filter(Boolean)
     .join(" / ");
   const AssetIcon = linkedAsset.assetType === "column" ? Columns3 : Table2;
-  const cardClass = typeCardClasses[rel.relationshipType] ?? styles.card;
+  const cardClass = typeCardClasses[rel.relationshipType] ?? "";
   const badgeClass = typeBadgeClasses[rel.relationshipType];
 
   return (
-    <div className={`${styles.card} ${cardClass}`}>
-      <div className={styles.cardInner}>
-        <div className={styles.iconContainer}>
+    <div className={`rounded-xl border p-3 hover:shadow-md transition-shadow ${cardClass}`}>
+      <div className="flex items-start gap-3">
+        <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-muted shrink-0">
           <AssetIcon className="h-4 w-4" />
         </div>
-        <div className={styles.cardBody}>
-          <div className={styles.cardHeader}>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => onNavigate(linkedAsset.id)}
               className="hover:underline focus:outline-none"
@@ -236,15 +235,15 @@ function RelationshipCard({
               {ASSET_TYPE_LABELS[linkedAsset.assetType as AssetType]}
             </Badge>
           </div>
-          <LtrText className={styles.cardPath}>
+          <LtrText className="text-xs text-muted-foreground mt-0.5">
             {linkedPath}
           </LtrText>
           {rel.description && (
-            <p className={styles.cardDescription} dir="rtl">
+            <p className="text-sm text-muted-foreground mt-1" dir="rtl">
               {rel.description}
             </p>
           )}
-          <div className={styles.cardMeta}>
+          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
             <span>נוצר ע&quot;י {rel.author.displayName}</span>
             <span>{new Date(rel.createdAt).toLocaleDateString("he-IL")}</span>
           </div>
@@ -272,9 +271,9 @@ function RelationshipCard({
 
 function EmptySection({ label }: { label: string }) {
   return (
-    <div className={styles.emptySection}>
-      <ArrowLeftRight className={`h-6 w-6 ${styles.emptyIcon}`} />
-      <p className={styles.emptyLabel}>{label}</p>
+    <div className="flex flex-col items-center justify-center py-8 text-muted-foreground gap-2">
+      <ArrowLeftRight className="h-6 w-6 opacity-20" />
+      <p className="text-sm">{label}</p>
     </div>
   );
 }

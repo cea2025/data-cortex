@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { isAdmin } from "@/lib/auth/utils";
 import { getAuditLogs, getAuditLogEntityTypes } from "@/app/actions/audit";
 import AuditLogViewer from "@/components/audit/audit-log-viewer";
-import styles from "./AuditPage.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -22,10 +21,10 @@ export default async function AuditPage({
   ]);
 
   return (
-    <div className={styles.container} dir="rtl">
-      <div className={styles.titleSection}>
-        <h1 className={styles.title}>היסטוריית שינויים</h1>
-        <p className={styles.description}>
+    <div className="p-6 max-w-4xl mx-auto" dir="rtl">
+      <div className="mb-6">
+        <h1 className="heading-h2-bold text-foreground">היסטוריית שינויים</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           מעקב אחר כל הפעולות שבוצעו במערכת
         </p>
       </div>

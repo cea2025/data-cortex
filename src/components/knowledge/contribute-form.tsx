@@ -20,7 +20,6 @@ import { KNOWLEDGE_TYPE_LABELS } from "@/types/domain";
 import { useOrgSlug } from "@/lib/org-context";
 import { toast } from "sonner";
 import { Send, Loader2 } from "lucide-react";
-import styles from "./ContributeForm.module.css";
 
 // ─── Zod Schema ─────────────────────────────────────────────────
 
@@ -156,7 +155,7 @@ function ContributeForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form} dir="rtl">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6" dir="rtl">
       {/* Asset Selection — hidden if pre-bound */}
       {!fixedAssetId && tables && (
         <>
@@ -223,7 +222,7 @@ function ContributeForm({
 
       {fixedAssetId && fixedAssetLabel && (
         <FieldGroup label="נכס מידע">
-          <div className={styles.fixedAssetDisplay}>
+          <div className="px-3 py-2 bg-muted/50 rounded-lg border text-sm">
             <LtrText>{fixedAssetLabel}</LtrText>
           </div>
         </FieldGroup>
@@ -317,14 +316,14 @@ function FieldGroup({
   children: React.ReactNode;
 }) {
   return (
-    <div className={styles.fieldGroup}>
-      <Label className={styles.fieldLabel}>
+    <div className="flex flex-col gap-2">
+      <Label className="body-medium-regular">
         {label}
         {required && <span className="text-destructive mr-1">*</span>}
       </Label>
       {children}
       {error && (
-        <p className={styles.errorText}>{error}</p>
+        <p className="text-xs text-red-500">{error}</p>
       )}
     </div>
   );

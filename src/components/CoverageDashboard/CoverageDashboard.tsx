@@ -38,7 +38,6 @@ import { useOrgSlug } from "@/lib/org-context";
 import { KNOWLEDGE_TYPE_LABELS } from "@/types/domain";
 import type { KnowledgeItemType } from "@/types/domain";
 import type { DashboardStats } from "@/app/actions/analytics";
-import styles from "./CoverageDashboard.module.css";
 
 const knowledgeIcons: Record<KnowledgeItemType, typeof BookOpen> = {
   business_rule: ScrollText,
@@ -60,100 +59,106 @@ function formatNumber(n: number): string {
   return n.toLocaleString("he-IL");
 }
 
-const medalClasses = [styles.medalGold, styles.medalSilver, styles.medalBronze];
+const medalClasses = [
+  "bg-gradient-to-br from-yellow-400 to-amber-500",
+  "bg-gradient-to-br from-gray-300 to-gray-400",
+  "bg-gradient-to-br from-orange-400 to-orange-600",
+];
 
 function CoverageDashboard({ stats }: { stats: DashboardStats }) {
   const { openSearch } = useUIStore();
   const orgSlug = useOrgSlug();
 
   return (
-    <div className={styles.container} dir="rtl">
+    <div className="p-6 max-w-7xl mx-auto flex flex-col gap-8" dir="rtl">
       {/* Header */}
-      <div className={styles.header}>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className={`${styles.headerTitle} heading-h1-bold`}>Data Cortex</h1>
-          <p className={`${styles.headerSubtitle} body-medium-regular`}>
+          <h1 className="heading-h1-bold text-gray-900 dark:text-cream-100">
+            Data Cortex
+          </h1>
+          <p className="body-medium-regular text-gray-500 dark:text-gray-400 mt-1">
             לוח בקרה — כיסוי תיעוד מטא-דאטה
           </p>
         </div>
         <Button
           variant="outline"
-          className={styles.searchTrigger}
+          className="min-w-[240px] justify-start text-gray-500 dark:text-gray-400 gap-2"
           onClick={openSearch}
         >
           <Search size={16} />
           <span className="body-medium-regular">חיפוש...</span>
-          <kbd className={`${styles.searchKbd} body-tiny-regular`}>
+          <kbd className="ms-auto pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded border border-gray-300 dark:border-navy-700 bg-gray-100 dark:bg-navy-900 px-1.5 font-mono text-gray-500 dark:text-gray-400 body-tiny-regular">
             <span>Ctrl</span>K
           </kbd>
         </Button>
       </div>
 
       {/* KPI Cards */}
-      <div className={styles.kpiGrid}>
-        <Card className={`${styles.kpiCard} ${styles.kpiCardTeal}`}>
-          <CardHeader className={styles.kpiHeader}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="rounded-xl shadow-sm border-t-4 border-t-teal-500">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="body-medium-semibold">טבלאות</CardTitle>
-            <div className={`${styles.kpiIconWrap} ${styles.kpiIconTeal}`}>
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400">
               <Table2 size={20} />
             </div>
           </CardHeader>
           <CardContent>
-            <div className={`${styles.kpiValue} heading-h1-bold`}>
+            <div className="heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
               {formatNumber(stats.totalTables)}
             </div>
-            <p className={`${styles.kpiMeta} body-small-regular`}>
+            <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-1">
               ב-{stats.systemBreakdown.length} מערכות
             </p>
           </CardContent>
         </Card>
 
-        <Card className={`${styles.kpiCard} ${styles.kpiCardBlue}`}>
-          <CardHeader className={styles.kpiHeader}>
+        <Card className="rounded-xl shadow-sm border-t-4 border-t-blue-500">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="body-medium-semibold">עמודות</CardTitle>
-            <div className={`${styles.kpiIconWrap} ${styles.kpiIconBlue}`}>
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
               <Columns3 size={20} />
             </div>
           </CardHeader>
           <CardContent>
-            <div className={`${styles.kpiValue} heading-h1-bold`}>
+            <div className="heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
               {formatNumber(stats.totalColumns)}
             </div>
-            <p className={`${styles.kpiMeta} body-small-regular`}>
+            <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-1">
               עמודות ממופות
             </p>
           </CardContent>
         </Card>
 
-        <Card className={`${styles.kpiCard} ${styles.kpiCardEmerald}`}>
-          <CardHeader className={styles.kpiHeader}>
+        <Card className="rounded-xl shadow-sm border-t-4 border-t-emerald-500">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="body-medium-semibold">פריטי ידע מאושרים</CardTitle>
-            <div className={`${styles.kpiIconWrap} ${styles.kpiIconEmerald}`}>
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
               <BookOpen size={20} />
             </div>
           </CardHeader>
           <CardContent>
-            <div className={`${styles.kpiValue} heading-h1-bold`}>
+            <div className="heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
               {formatNumber(stats.totalKnowledgeItems)}
             </div>
-            <p className={`${styles.kpiMeta} body-small-regular`}>
+            <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-1">
               {stats.documentedAssetsCount} נכסים מתועדים
             </p>
           </CardContent>
         </Card>
 
-        <Card className={`${styles.kpiCard} ${styles.kpiCardAmber}`}>
-          <CardHeader className={styles.kpiHeader}>
+        <Card className="rounded-xl shadow-sm border-t-4 border-t-amber-500">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="body-medium-semibold">כיסוי תיעוד</CardTitle>
-            <div className={`${styles.kpiIconWrap} ${styles.kpiIconAmber}`}>
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
               <Target size={20} />
             </div>
           </CardHeader>
           <CardContent>
-            <div className={`${styles.kpiValue} heading-h1-bold`}>
+            <div className="heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
               {stats.coveragePercentage}%
             </div>
-            <p className={`${styles.kpiMeta} body-small-regular`}>
+            <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-1">
               מתוך {formatNumber(stats.totalTables + stats.totalColumns)} נכסים
             </p>
           </CardContent>
@@ -161,11 +166,11 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
       </div>
 
       {/* Coverage Progress + System Breakdown */}
-      <div className={styles.middleGrid}>
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+        <Card className="rounded-xl shadow-sm">
           <CardHeader>
-            <div className={styles.cardTitleRow}>
-              <TrendingUp size={20} className={styles.cardTitleIcon} />
+            <div className="flex items-center gap-2">
+              <TrendingUp size={20} className="text-gray-700 dark:text-gray-300" />
               <CardTitle>התקדמות כיסוי תיעוד</CardTitle>
             </div>
             <CardDescription>
@@ -173,10 +178,10 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className={styles.coverageStats}>
-              <div className={styles.coverageRow}>
-                <span className={`${styles.coverageBarLabel} body-medium-semibold`}>כיסוי כולל</span>
-                <span className={`${styles.coverageBarValue} heading-h2-bold`}>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="body-medium-semibold text-gray-900 dark:text-cream-100">כיסוי כולל</span>
+                <span className="heading-h2-bold text-gray-900 dark:text-cream-100 tabular-nums">
                   {stats.coveragePercentage}%
                 </span>
               </div>
@@ -184,21 +189,21 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
                 value={stats.coveragePercentage}
                 className="h-4 [&>[data-slot=progress-indicator]]:bg-gradient-to-l [&>[data-slot=progress-indicator]]:from-teal-500 [&>[data-slot=progress-indicator]]:to-emerald-500"
               />
-              <div className={styles.coverageRow}>
-                <span className="body-small-regular" style={{ color: "var(--font-secondary-default)" }}>
+              <div className="flex items-center justify-between">
+                <span className="body-small-regular text-gray-500 dark:text-gray-400">
                   {formatNumber(stats.documentedAssetsCount)} מתועדים
                 </span>
-                <span className="body-small-regular" style={{ color: "var(--font-secondary-default)" }}>
+                <span className="body-small-regular text-gray-500 dark:text-gray-400">
                   {formatNumber(stats.totalTables + stats.totalColumns - stats.documentedAssetsCount)} ממתינים לתיעוד
                 </span>
               </div>
             </div>
 
-            <div className={styles.ctaBanner}>
-              <Sparkles size={20} className={styles.ctaIcon} />
-              <div className={styles.ctaContent}>
-                <p className={`${styles.ctaTitle} body-medium-semibold`}>עזרו לנו לתעד!</p>
-                <p className={`${styles.ctaSubtitle} body-small-regular`}>
+            <div className="flex items-center gap-3 p-4 mt-6 rounded-xl border border-dashed border-gold-400 bg-gold-50 dark:bg-gold-950/20">
+              <Sparkles size={20} className="shrink-0 text-amber-500" />
+              <div className="flex-1">
+                <p className="body-medium-semibold text-gray-900 dark:text-cream-100">עזרו לנו לתעד!</p>
+                <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-0.5">
                   כל פריט ידע שתוסיפו משפר את ההבנה הארגונית של מבני הנתונים
                 </p>
               </div>
@@ -212,28 +217,28 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-xl shadow-sm">
           <CardHeader>
-            <div className={styles.cardTitleRow}>
-              <Database size={20} className={styles.cardTitleIcon} />
+            <div className="flex items-center gap-2">
+              <Database size={20} className="text-gray-700 dark:text-gray-300" />
               <CardTitle>מערכות</CardTitle>
             </div>
             <CardDescription>פילוח טבלאות לפי מערכת מקור</CardDescription>
           </CardHeader>
           <CardContent>
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
+            <div className="flex flex-col gap-4">
               {stats.systemBreakdown.map((system) => {
                 const pct =
                   stats.totalTables > 0
                     ? Math.round((system.tableCount / stats.totalTables) * 100)
                     : 0;
                 return (
-                  <div key={system.systemName} className={styles.systemBreakdownItem}>
-                    <div className={styles.systemBreakdownRow}>
-                      <LtrText className={`${styles.systemName} body-medium-semibold`}>
+                  <div key={system.systemName} className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <LtrText className="body-medium-semibold text-gray-900 dark:text-cream-100">
                         {system.systemName}
                       </LtrText>
-                      <span className={`${styles.systemCount} body-small-regular`}>
+                      <span className="body-small-regular text-gray-500 dark:text-gray-400 tabular-nums">
                         {system.tableCount} טבלאות
                       </span>
                     </div>
@@ -250,11 +255,11 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
       </div>
 
       {/* Bottom Row: Contributors + Recent Knowledge */}
-      <div className={styles.bottomGrid}>
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="rounded-xl shadow-sm">
           <CardHeader>
-            <div className={styles.cardTitleRow}>
-              <Trophy size={20} className={styles.cardTitleIconAmber} />
+            <div className="flex items-center gap-2">
+              <Trophy size={20} className="text-amber-500" />
               <CardTitle>תורמים מובילים</CardTitle>
             </div>
             <CardDescription>
@@ -263,18 +268,21 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
           </CardHeader>
           <CardContent>
             {stats.topContributors.length === 0 ? (
-              <div className={styles.emptyState}>
-                <Trophy size={40} className={styles.emptyIcon} />
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <Trophy size={40} className="mx-auto mb-3 opacity-20" />
                 <p className="body-medium-regular">אין תורמים עדיין</p>
-                <p className="body-small-regular" style={{ marginTop: "var(--space-xs)" }}>
+                <p className="body-small-regular mt-1">
                   היו הראשונים להוסיף ידע ולהופיע כאן!
                 </p>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+              <div className="flex flex-col gap-3">
                 {stats.topContributors.map((contributor, idx) => (
-                  <div key={contributor.id} className={styles.contributorRow}>
-                    <div className={styles.contributorAvatar}>
+                  <div
+                    key={contributor.id}
+                    className="flex items-center gap-3 p-3 rounded-xl transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-navy-900"
+                  >
+                    <div className="relative">
                       <Avatar size="lg">
                         {contributor.avatarUrl ? (
                           <AvatarImage
@@ -287,16 +295,18 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
                         </AvatarFallback>
                       </Avatar>
                       {idx < 3 && (
-                        <div className={`${styles.medal} ${medalClasses[idx]} body-tiny-bold`}>
+                        <div
+                          className={`absolute -top-1 -end-1 flex items-center justify-center w-5 h-5 rounded-full text-white body-tiny-bold ${medalClasses[idx]}`}
+                        >
                           {idx + 1}
                         </div>
                       )}
                     </div>
-                    <div className={styles.contributorInfo}>
-                      <p className={`${styles.contributorName} body-medium-semibold`}>
+                    <div className="flex-1 min-w-0">
+                      <p className="body-medium-semibold text-gray-900 dark:text-cream-100 truncate">
                         {contributor.displayName}
                       </p>
-                      <p className={`${styles.contributorCount} body-small-regular`}>
+                      <p className="body-small-regular text-gray-500 dark:text-gray-400">
                         {contributor.count} פריטי ידע מאושרים
                       </p>
                     </div>
@@ -311,10 +321,10 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-xl shadow-sm">
           <CardHeader>
-            <div className={styles.cardTitleRow}>
-              <Clock size={20} className={styles.cardTitleIcon} />
+            <div className="flex items-center gap-2">
+              <Clock size={20} className="text-gray-700 dark:text-gray-300" />
               <CardTitle>ידע שאושר לאחרונה</CardTitle>
             </div>
             <CardDescription>
@@ -323,10 +333,10 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
           </CardHeader>
           <CardContent>
             {stats.recentKnowledge.length === 0 ? (
-              <div className={styles.emptyState}>
-                <BookOpen size={40} className={styles.emptyIcon} />
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <BookOpen size={40} className="mx-auto mb-3 opacity-20" />
                 <p className="body-medium-regular">אין פריטי ידע מאושרים עדיין</p>
-                <p className="body-small-regular" style={{ marginTop: "var(--space-xs)" }}>
+                <p className="body-small-regular mt-1">
                   התחילו לתעד ופריטים שיאושרו יופיעו כאן
                 </p>
               </div>
@@ -346,13 +356,13 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
                       key={item.id}
                       href={`/${orgSlug}/assets/${item.dataAsset.id}`}
                     >
-                      <div className={styles.knowledgeFeedItem}>
-                        <div className={styles.feedIconWrap}>
-                          <Icon size={16} className={styles.feedIcon} />
+                      <div className="flex items-start gap-3 p-3 rounded-xl transition-colors duration-150 cursor-pointer hover:bg-gray-50 dark:hover:bg-navy-900">
+                        <div className="flex shrink-0 items-center justify-center w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 mt-0.5">
+                          <Icon size={16} className="text-emerald-600 dark:text-emerald-400" />
                         </div>
-                        <div className={styles.feedContent}>
-                          <div className={styles.feedTitleRow}>
-                            <p className={`${styles.feedTitle} body-medium-semibold`}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="body-medium-semibold text-gray-900 dark:text-cream-100 truncate">
                               {item.title}
                             </p>
                             <Badge variant="outline">
@@ -361,7 +371,7 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
                               </span>
                             </Badge>
                           </div>
-                          <div className={`${styles.feedMeta} body-small-regular`}>
+                          <div className="flex items-center gap-2 mt-1 body-small-regular text-gray-500 dark:text-gray-400">
                             <LtrText>{assetLabel}</LtrText>
                             <span>·</span>
                             <span>{item.author.displayName}</span>

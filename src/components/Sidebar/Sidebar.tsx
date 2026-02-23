@@ -20,7 +20,6 @@ import { useUIStore } from "@/lib/store/ui-store";
 import { createBrowserClient } from "@supabase/ssr";
 import { useOrgSlug, useUserRole } from "@/lib/org-context";
 import OrgSwitcher from "@/components/org-switcher";
-import styles from "./Sidebar.module.css";
 
 interface NavItem {
   path: string;
@@ -54,14 +53,16 @@ function Sidebar() {
     router.push("/login");
   };
 
-  const asideClass = `${styles.aside} ${sidebarCollapsed ? styles.asideCollapsed : styles.asideExpanded}`;
-
   return (
-    <aside className={asideClass}>
-      <div className={styles.brand}>
-        <Database className={styles.brandIcon} size={24} />
+    <aside
+      className={`flex flex-col border-e border-gray-200 dark:border-navy-800 bg-white dark:bg-navy-950 transition-all duration-200 ${
+        sidebarCollapsed ? "w-16" : "w-56"
+      }`}
+    >
+      <div className="flex items-center gap-2 p-4 border-b border-gray-200 dark:border-navy-800">
+        <Database className="shrink-0 text-teal-600" size={24} />
         {!sidebarCollapsed && (
-          <span className={`${styles.brandLabel} body-large-semibold`}>
+          <span className="body-large-semibold text-gray-900 dark:text-cream-100">
             Data Cortex
           </span>
         )}
@@ -69,16 +70,18 @@ function Sidebar() {
 
       {!sidebarCollapsed && <OrgSwitcher />}
 
-      <nav className={styles.nav}>
+      <nav className="flex-1 p-2 flex flex-col gap-1">
         <button
           onClick={openSearch}
-          className={`${styles.navButton} body-medium-regular`}
+          className="flex w-full items-center gap-3 px-3 py-2 rounded-xl border-none bg-transparent cursor-pointer transition-colors duration-150 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-navy-900 hover:text-gray-900 dark:hover:text-cream-100 body-medium-regular"
         >
-          <Search className={styles.navIcon} />
+          <Search className="shrink-0 w-5 h-5" />
           {!sidebarCollapsed && (
             <>
-              <span className={styles.navLabel}>חיפוש</span>
-              <kbd className={`${styles.kbd} body-tiny-regular`}>Ctrl+K</kbd>
+              <span className="flex-1 text-start">חיפוש</span>
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-gray-300 dark:border-navy-700 bg-gray-100 dark:bg-navy-900 px-1.5 text-gray-500 dark:text-gray-400 pointer-events-none select-none font-mono body-tiny-regular">
+                Ctrl+K
+              </kbd>
             </>
           )}
         </button>
@@ -95,9 +98,13 @@ function Sidebar() {
             return (
               <Link key={item.path} href={href}>
                 <div
-                  className={`${styles.navButton} ${isActive ? styles.navButtonActive : ""} body-medium-regular`}
+                  className={`flex w-full items-center gap-3 px-3 py-2 rounded-xl border-none bg-transparent cursor-pointer transition-colors duration-150 body-medium-regular ${
+                    isActive
+                      ? "bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-400"
+                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-navy-900 hover:text-gray-900 dark:hover:text-cream-100"
+                  }`}
                 >
-                  <item.icon className={styles.navIcon} />
+                  <item.icon className="shrink-0 w-5 h-5" />
                   {!sidebarCollapsed && <span>{item.label}</span>}
                 </div>
               </Link>
@@ -105,7 +112,7 @@ function Sidebar() {
           })}
       </nav>
 
-      <div className={styles.footer}>
+      <div className="p-2 border-t border-gray-200 dark:border-navy-800 flex flex-col gap-1">
         <Button
           variant="ghost"
           size={sidebarCollapsed ? "icon" : "sm"}

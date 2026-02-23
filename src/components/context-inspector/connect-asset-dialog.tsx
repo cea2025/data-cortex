@@ -43,7 +43,6 @@ import {
 } from "@/app/actions/relationships";
 import { RELATIONSHIP_TYPE_LABELS, ASSET_TYPE_LABELS } from "@/types/domain";
 import type { RelationshipType, AssetType } from "@/types/domain";
-import styles from "./ConnectAssetDialog.module.css";
 
 interface ConnectAssetDialogProps {
   open: boolean;
@@ -136,9 +135,9 @@ function ConnectAssetDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${styles.content} sm:max-w-lg`} dir="rtl">
-        <DialogHeader className={styles.header}>
-          <DialogTitle className={styles.headerTitle}>
+      <DialogContent className="sm:max-w-lg" dir="rtl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
             <Link2 className="h-5 w-5 text-teal-500" />
             צור קשר חדש
           </DialogTitle>
@@ -151,7 +150,7 @@ function ConnectAssetDialog({
         </DialogHeader>
 
         {step === "search" ? (
-          <div className={styles.searchStep}>
+          <div className="py-2">
             <Command shouldFilter={false} className="border-none">
               <CommandInput
                 dir="ltr"
@@ -159,9 +158,9 @@ function ConnectAssetDialog({
                 value={query}
                 onValueChange={handleQueryChange}
               />
-              <CommandList className={styles.searchList}>
+              <CommandList className="max-h-64">
                 {searching && (
-                  <div className={styles.searchingState}>
+                  <div className="flex items-center justify-center gap-2 py-4 text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span className="body-small-regular">מחפש...</span>
                   </div>
@@ -178,13 +177,13 @@ function ConnectAssetDialog({
                           key={asset.id}
                           value={asset.id}
                           onSelect={() => handleSelect(asset)}
-                          className={styles.resultItem}
+                          className="flex items-center gap-3 py-2"
                         >
-                          <div className={styles.resultIcon}>
+                          <div className="flex items-center justify-center h-7 w-7 rounded-lg bg-muted shrink-0">
                             <Icon className="h-3.5 w-3.5" />
                           </div>
-                          <div className={styles.resultBody}>
-                            <div className={styles.resultHeader}>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
                               <LtrText className="body-medium-regular truncate">
                                 {asset.label}
                               </LtrText>
@@ -192,7 +191,7 @@ function ConnectAssetDialog({
                                 {ASSET_TYPE_LABELS[asset.assetType as AssetType]}
                               </Badge>
                             </div>
-                            <LtrText className={styles.resultPath}>
+                            <LtrText className="text-xs text-muted-foreground truncate mt-0.5">
                               {asset.path}
                             </LtrText>
                           </div>
@@ -205,29 +204,29 @@ function ConnectAssetDialog({
             </Command>
           </div>
         ) : (
-          <div className={styles.detailsStep}>
+          <div className="space-y-4">
             {/* Source → Target summary */}
-            <div className={styles.summaryBox}>
-              <div className={styles.summaryCell}>
-                <p className={styles.summaryLabel}>מקור</p>
-                <LtrText className={styles.summaryValue}>{sourceAssetLabel}</LtrText>
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground mb-1">מקור</p>
+                <LtrText className="text-sm font-semibold truncate">{sourceAssetLabel}</LtrText>
               </div>
-              <div className={styles.summaryIcon}>
+              <div className="shrink-0 text-teal-500">
                 <Link2 className="h-5 w-5" />
               </div>
-              <div className={styles.summaryCell}>
-                <p className={styles.summaryLabel}>יעד</p>
-                <LtrText className={styles.summaryValue}>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground mb-1">יעד</p>
+                <LtrText className="text-sm font-semibold truncate">
                   {selectedAsset?.label}
                 </LtrText>
-                <LtrText className={styles.summaryPath}>
+                <LtrText className="text-xs text-muted-foreground truncate">
                   {selectedAsset?.path}
                 </LtrText>
               </div>
             </div>
 
             {/* Relationship type */}
-            <div className={styles.fieldGroup}>
+            <div className="space-y-2">
               <Label className="body-medium-regular">סוג הקשר</Label>
               <Select value={relType} onValueChange={(v) => setRelType(v as RelationshipType)}>
                 <SelectTrigger className="w-full">
@@ -246,7 +245,7 @@ function ConnectAssetDialog({
             </div>
 
             {/* Description */}
-            <div className={styles.fieldGroup}>
+            <div className="space-y-2">
               <Label className="body-medium-regular">תיאור (אופציונלי)</Label>
               <Textarea
                 dir="rtl"
@@ -260,13 +259,12 @@ function ConnectAssetDialog({
           </div>
         )}
 
-        <DialogFooter className={styles.footer}>
+        <DialogFooter>
           {step === "details" && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => setStep("search")}
-              className={styles.footerBack}
             >
               חזרה לחיפוש
             </Button>

@@ -40,7 +40,6 @@ import {
   Loader2,
 } from "lucide-react";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
-import styles from "./KnowledgeTabs.module.css";
 
 type TopTab = "knowledge" | "relationships" | "lineage";
 
@@ -126,31 +125,34 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
     });
   };
 
-  // Lazy-load lineage graph
   const LineageGraph = topTab === "lineage"
     ? require("@/components/context-inspector/lineage-graph").default
     : null;
 
   return (
-    <div className={styles.container} dir="rtl">
+    <div className="flex flex-col h-full" dir="rtl">
       {/* Top-level section switcher */}
-      <div className={styles.sectionSwitcher}>
+      <div className="flex items-center gap-1 px-3 py-2 border-b">
         <button
           onClick={() => setTopTab("knowledge")}
-          className={`${styles.sectionBtn} body-small-semibold ${
-            topTab === "knowledge" ? styles.sectionBtnActive : styles.sectionBtnInactive
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
+            topTab === "knowledge"
+              ? "bg-gold-100 text-gold-700"
+              : "text-muted-foreground hover:bg-muted"
           }`}
         >
           <Lightbulb className="h-3.5 w-3.5" />
           ידע ארגוני
           {totalKnowledge > 0 && (
-            <span className={`${styles.badge} body-tiny-regular`}>{totalKnowledge}</span>
+            <span className="inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-current/10 text-[10px]">{totalKnowledge}</span>
           )}
         </button>
         <button
           onClick={() => setTopTab("relationships")}
-          className={`${styles.sectionBtn} body-small-semibold ${
-            topTab === "relationships" ? styles.sectionBtnActiveRelationships : styles.sectionBtnInactive
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
+            topTab === "relationships"
+              ? "bg-teal-100 text-teal-700"
+              : "text-muted-foreground hover:bg-muted"
           }`}
         >
           <ArrowLeftRight className="h-3.5 w-3.5" />
@@ -158,8 +160,10 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
         </button>
         <button
           onClick={() => setTopTab("lineage")}
-          className={`${styles.sectionBtn} body-small-semibold ${
-            topTab === "lineage" ? styles.sectionBtnActiveLineage : styles.sectionBtnInactive
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
+            topTab === "lineage"
+              ? "bg-navy-100 text-navy-700"
+              : "text-muted-foreground hover:bg-muted"
           }`}
         >
           <GitBranch className="h-3.5 w-3.5" />
@@ -170,20 +174,20 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
       {topTab === "knowledge" ? (
         <>
           {/* Canonical Definition Section */}
-          <div className={styles.canonicalSection}>
-            <div className={`${styles.canonicalHeader} body-small-semibold`}>
+          <div className="mx-4 mt-4 mb-2 p-5 rounded-2xl border-2 border-teal-300 bg-gradient-to-r from-teal-50 to-gold-50/30 dark:from-teal-950/30 dark:to-gold-950/10 dark:border-teal-700">
+            <div className="flex items-center gap-2 text-teal-700 dark:text-teal-400 mb-3 text-base font-bold">
               <Crown className="h-4 w-4" />
               הגדרה רשמית
             </div>
             {canonicalItems.length > 0 ? (
-              <div className={styles.tabsContentInner}>
+              <div className="flex flex-col gap-3 p-4">
                 {canonicalItems.map((item) => (
                   <KnowledgeItemCard key={item.id} item={item} />
                 ))}
               </div>
             ) : (
               <button
-                className={`${styles.proposeBtn} body-small-semibold`}
+                className="w-full py-3 rounded-xl border-2 border-dashed border-teal-300 text-teal-600 hover:bg-teal-50 hover:border-teal-400 transition-colors flex items-center justify-center gap-2 font-semibold"
                 onClick={handleProposeCanonical}
               >
                 <Crown className="h-4 w-4" />
@@ -193,13 +197,13 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
           </div>
 
           {/* Community Notes header */}
-          <div className={`${styles.communityHeader} body-small-semibold`}>
+          <div className="px-4 py-2 text-sm font-semibold text-muted-foreground">
             <span>הערות קהילתיות ({communityItems.length})</span>
           </div>
 
           {/* Knowledge panel header */}
-          <div className={styles.panelHeader}>
-            <div className={styles.headerInner}>
+          <div className="px-4 py-2 border-b">
+            <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-amber-500" />
               <h2 className="body-medium-semibold">ידע ארגוני</h2>
               <Button
@@ -214,9 +218,9 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
             </div>
           </div>
 
-          <Tabs defaultValue={defaultTab} className={styles.tabsRoot}>
-            <div className={styles.tabsHeader}>
-              <TabsList variant="line" className={styles.tabsList}>
+          <Tabs defaultValue={defaultTab} className="flex flex-col flex-1 min-h-0">
+            <div className="px-4 py-2 border-b">
+              <TabsList variant="line">
                 <TabButton value="business_rule" count={businessRules.length}>
                   <BookOpen className="h-3.5 w-3.5" />
                   כללים
@@ -241,8 +245,8 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
             </div>
 
             <ScrollArea className="flex-1">
-              <TabsContent value="business_rule" className={styles.tabsContent}>
-                <div className={styles.tabsContentInner}>
+              <TabsContent value="business_rule" className="p-0">
+                <div className="flex flex-col gap-3 p-4">
                   {businessRules.length === 0 ? (
                     <EmptyState icon={BookOpen} label="אין כללים עסקיים" />
                   ) : (
@@ -253,8 +257,8 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="warning" className={styles.tabsContent}>
-                <div className={styles.tabsContentInner}>
+              <TabsContent value="warning" className="p-0">
+                <div className="flex flex-col gap-3 p-4">
                   {warnings.length === 0 ? (
                     <EmptyState icon={AlertTriangle} label="אין אזהרות" />
                   ) : (
@@ -265,8 +269,8 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="calculation" className={styles.tabsContent}>
-                <div className={styles.tabsContentInner}>
+              <TabsContent value="calculation" className="p-0">
+                <div className="flex flex-col gap-3 p-4">
                   {calculations.length === 0 ? (
                     <EmptyState icon={Calculator} label="אין לוגיקת חישוב" />
                   ) : (
@@ -277,8 +281,8 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="deprecation" className={styles.tabsContent}>
-                <div className={styles.tabsContentInner}>
+              <TabsContent value="deprecation" className="p-0">
+                <div className="flex flex-col gap-3 p-4">
                   {deprecations.length === 0 ? (
                     <EmptyState icon={Ban} label="אין פריטים שהוצאו משימוש" />
                   ) : (
@@ -289,8 +293,8 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="ai" className={styles.tabsContent}>
-                <div className={styles.tabsContentInner}>
+              <TabsContent value="ai" className="p-0">
+                <div className="flex flex-col gap-3 p-4">
                   <AIEvidencePanel
                     insights={asset.aiInsights}
                     assetId={asset.id}
@@ -317,7 +321,7 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
           if (!open) setSheetIsCanonical(false);
         }}
       >
-        <SheetContent side="left" className={styles.sheetContent} dir="rtl">
+        <SheetContent side="left" className="w-full sm:max-w-xl" dir="rtl">
           <SheetHeader>
             <SheetTitle>
               {sheetIsCanonical ? "הצע הגדרה רשמית" : "הוספת פריט ידע"}
@@ -328,7 +332,7 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
                 : "הוסף כלל עסקי, אזהרה או תיעוד עבור הנכס הזה. הפריט יישלח לאישור הבעלים."}
             </SheetDescription>
           </SheetHeader>
-          <div className={styles.sheetInner}>
+          <div className="p-4">
             <ContributeForm
               fixedAssetId={asset.id}
               fixedAssetLabel={assetLabel}
@@ -368,7 +372,7 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
               את ההגדרה גם עליהן?
             </DialogDescription>
           </DialogHeader>
-          <table className={styles.bulkTable}>
+          <table className="w-full text-sm">
             <thead>
               <tr>
                 <th className="body-small-semibold">טבלה</th>
@@ -382,7 +386,7 @@ function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
               ))}
             </tbody>
           </table>
-          <div className={styles.bulkActions}>
+          <div className="flex justify-end gap-2 pt-4">
             <Button
               variant="outline"
               onClick={() => setBulkDialogOpen(false)}
@@ -415,10 +419,10 @@ function TabButton({
   children: React.ReactNode;
 }) {
   return (
-    <TabsTrigger value={value} className={`${styles.tabButton} body-small-semibold`}>
+    <TabsTrigger value={value} className="gap-1.5 body-small-semibold">
       {children}
       {count > 0 && (
-        <span className={`${styles.badge} body-tiny-regular`}>{count}</span>
+        <span className="inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-current/10 text-[10px]">{count}</span>
       )}
     </TabsTrigger>
   );
@@ -432,8 +436,8 @@ function EmptyState({
   label: string;
 }) {
   return (
-    <div className={styles.emptyState}>
-      <Icon className={`h-8 w-8 ${styles.emptyStateIcon}`} />
+    <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+      <Icon className="h-8 w-8 opacity-20 mb-2" />
       <p className="body-medium-regular">{label}</p>
     </div>
   );

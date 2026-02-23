@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { updateKnowledgeStatus } from "@/app/actions/knowledge";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import styles from "./ReviewActions.module.css";
 
 interface ReviewActionsProps {
   itemId: string;
@@ -31,11 +30,11 @@ function ReviewActions({ itemId }: ReviewActionsProps) {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="flex items-center gap-2">
       <Button
         size="sm"
         variant="default"
-        className={styles.approveBtn}
+        className="bg-teal-600 text-white hover:bg-teal-700 gap-1.5"
         disabled={isPending}
         onClick={() => handleAction("approved")}
       >
@@ -49,7 +48,7 @@ function ReviewActions({ itemId }: ReviewActionsProps) {
       <Button
         size="sm"
         variant="outline"
-        className={styles.rejectBtn}
+        className="text-red-600 border-red-200 hover:bg-red-50 gap-1.5"
         disabled={isPending}
         onClick={() => handleAction("rejected")}
       >

@@ -1,6 +1,5 @@
 import { User, FileText, Cpu } from "lucide-react";
 import type { SourceProvenance } from "@/types/domain";
-import styles from "./ProvenanceTag.module.css";
 
 interface ProvenanceTagProps {
   provenance: unknown;
@@ -11,28 +10,28 @@ function ProvenanceTag({ provenance, author }: ProvenanceTagProps) {
   const prov = provenance as SourceProvenance | null;
 
   return (
-    <div className={styles.container}>
-      <span className={styles.item}>
-        <User className={styles.icon} />
-        <span className={styles.author}>{author.displayName}</span>
+    <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+      <span className="inline-flex items-center gap-1">
+        <User className="w-3 h-3 shrink-0" />
+        <span className="font-medium text-foreground/70">{author.displayName}</span>
       </span>
       {prov?.source && (
         <>
-          <span className={styles.separator}>|</span>
-          <span className={styles.item}>
-            <FileText className={styles.icon} />
+          <span className="text-border">|</span>
+          <span className="inline-flex items-center gap-1">
+            <FileText className="w-3 h-3 shrink-0" />
             {prov.source}
           </span>
         </>
       )}
       {prov?.generatedBy && (
         <>
-          <span className={styles.separator}>|</span>
-          <span className={styles.item}>
-            <Cpu className={styles.icon} />
+          <span className="text-border">|</span>
+          <span className="inline-flex items-center gap-1">
+            <Cpu className="w-3 h-3 shrink-0" />
             {prov.generatedBy}
             {prov.confidence != null && (
-              <span className={styles.confidence}>
+              <span className="font-mono text-teal-600">
                 ({Math.round(prov.confidence * 100)}%)
               </span>
             )}

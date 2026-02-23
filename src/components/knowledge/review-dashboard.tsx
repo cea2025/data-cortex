@@ -18,7 +18,6 @@ import {
   User,
   Clock,
 } from "lucide-react";
-import styles from "./ReviewDashboard.module.css";
 
 const typeIcons: Record<KnowledgeItemType, typeof BookOpen> = {
   business_rule: BookOpen,
@@ -31,9 +30,9 @@ function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
   const orgSlug = useOrgSlug();
   return (
     <div>
-      <div className={styles.header}>
+      <div className="flex items-center gap-2 mb-4">
         <ClipboardCheck className="h-5 w-5 text-primary" />
-        <h2 className={styles.headerTitle}>ממתינים לאישור</h2>
+        <h2 className="text-lg font-semibold">ממתינים לאישור</h2>
         {items.length > 0 && (
           <Badge variant="secondary" className="text-xs">
             {items.length}
@@ -43,14 +42,14 @@ function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
 
       {items.length === 0 ? (
         <Card>
-          <CardContent className={styles.emptyCard}>
-            <ClipboardCheck className={`h-10 w-10 ${styles.emptyIcon}`} />
-            <p className={styles.emptyTitle}>אין פריטים הממתינים לבדיקה</p>
-            <p className={styles.emptySubtitle}>כל פריטי הידע מעודכנים ומאושרים</p>
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <ClipboardCheck className="h-10 w-10 text-muted-foreground/40 mb-3" />
+            <p className="text-sm font-medium text-muted-foreground">אין פריטים הממתינים לבדיקה</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">כל פריטי הידע מעודכנים ומאושרים</p>
           </CardContent>
         </Card>
       ) : (
-        <div className={styles.list}>
+        <div className="flex flex-col gap-3">
           {items.map((item) => {
             const Icon =
               typeIcons[item.itemType as KnowledgeItemType] ?? BookOpen;
@@ -63,25 +62,25 @@ function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
             return (
               <Card
                 key={item.id}
-                className={styles.reviewCard}
+                className="border-r-2 border-r-gold-400 hover:shadow-md transition-shadow rounded-xl"
               >
-                <CardContent className={styles.cardContent}>
-                  <div className={styles.cardInner}>
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
                     {/* Icon */}
-                    <div className={styles.iconContainer}>
+                    <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-gold-100 text-gold-600 shrink-0">
                       <Icon className="h-4 w-4" />
                     </div>
 
                     {/* Content */}
-                    <div className={styles.cardBody}>
-                      <div className={styles.cardHeader}>
-                        <h3 className={styles.cardTitle}>{item.title}</h3>
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <h3 className="text-sm font-semibold truncate">{item.title}</h3>
                         <Badge variant="outline" className="text-[10px]">
                           {KNOWLEDGE_TYPE_LABELS[item.itemType as KnowledgeItemType]}
                         </Badge>
                         <Badge
                           variant="secondary"
-                          className={`text-[10px] ${styles.pendingBadge}`}
+                          className="text-[10px] bg-gold-100 text-gold-700"
                         >
                           ממתין לבדיקה
                         </Badge>
@@ -89,29 +88,29 @@ function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
 
                       {/* Content preview */}
                       {item.contentHebrew && (
-                        <p className={styles.contentPreview} dir="rtl">
+                        <p className="text-xs text-muted-foreground line-clamp-2" dir="rtl">
                           {item.contentHebrew}
                         </p>
                       )}
                       {item.contentEnglish && !item.contentHebrew && (
-                        <p className={styles.contentPreview} dir="ltr">
+                        <p className="text-xs text-muted-foreground line-clamp-2" dir="ltr">
                           {item.contentEnglish}
                         </p>
                       )}
 
                       {/* Meta row */}
-                      <div className={styles.metaRow}>
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                         <Link
                           href={`/${orgSlug}/assets/${item.dataAsset.id}`}
                           className="inline-flex items-center gap-1 text-primary hover:underline"
                         >
                           <LtrText className="body-xsmall-regular">{assetName}</LtrText>
                         </Link>
-                        <span className={styles.metaItem}>
+                        <span className="inline-flex items-center gap-1">
                           <User className="h-3 w-3" />
                           {item.author.displayName}
                         </span>
-                        <span className={styles.metaItem}>
+                        <span className="inline-flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {new Date(item.createdAt).toLocaleDateString("he-IL", {
                             day: "numeric",
