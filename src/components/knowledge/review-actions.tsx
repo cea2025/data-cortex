@@ -18,7 +18,7 @@ export function ReviewActions({ itemId }: ReviewActionsProps) {
   const handleAction = (action: "approved" | "rejected") => {
     startTransition(async () => {
       try {
-        await updateKnowledgeStatus(itemId, action, "demo-user-id");
+        await updateKnowledgeStatus(itemId, action);
         toast.success(
           action === "approved" ? "פריט הידע אושר" : "פריט הידע נדחה"
         );

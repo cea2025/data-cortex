@@ -8,22 +8,37 @@ import {
   Plus,
   Bell,
   LayoutDashboard,
+  History,
   PanelRightClose,
   PanelRightOpen,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/lib/store/ui-store";
+import { createBrowserClient } from "@supabase/ssr";
+import { useRouter } from "next/navigation";
 
 const navLinks = [
   { href: "/", icon: LayoutDashboard, label: "לוח בקרה" },
   { href: "/contribute", icon: Plus, label: "הוסף ידע" },
   { href: "/notifications", icon: Bell, label: "התראות" },
+  { href: "/audit", icon: History, label: "היסטוריה" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { sidebarCollapsed, toggleSidebar, openSearch } = useUIStore();
+
+  const handleSignOut = async () => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   return (
     <aside
@@ -40,7 +55,6 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 p-2 space-y-1">
-        {/* Search button – opens Omnibar */}
         <button
           onClick={openSearch}
           className={cn(
@@ -59,7 +73,6 @@ export function Sidebar() {
           )}
         </button>
 
-        {/* Navigation links */}
         {navLinks.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -80,7 +93,16 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-2 border-t border-border">
+      <div className="p-2 border-t border-border space-y-1">
+        <Button
+          variant="ghost"
+          size={sidebarCollapsed ? "icon" : "sm"}
+          className={cn("w-full gap-2", !sidebarCollapsed && "justify-start px-3")}
+          onClick={handleSignOut}
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          {!sidebarCollapsed && <span className="text-xs">יציאה</span>}
+        </Button>
         <Button
           variant="ghost"
           size="icon"

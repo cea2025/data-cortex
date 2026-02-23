@@ -3,13 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { createAuditLog } from "@/lib/audit";
+import { requireUser } from "@/lib/auth";
 import type { KnowledgeItemType } from "@/generated/prisma/client";
 
 // ─── Submit Draft (status → "review") ───────────────────────────
 
 interface SubmitDraftParams {
   dataAssetId: string;
-  authorId: string;
   title: string;
   itemType: KnowledgeItemType;
   contentHebrew?: string;
@@ -17,17 +17,19 @@ interface SubmitDraftParams {
 }
 
 export async function submitKnowledgeDraft(params: SubmitDraftParams) {
+  const user = await requireUser();
+
   const item = await prisma.knowledgeItem.create({
     data: {
       dataAssetId: params.dataAssetId,
-      authorId: params.authorId,
+      authorId: user.id,
       title: params.title,
       itemType: params.itemType,
       contentHebrew: params.contentHebrew,
       contentEnglish: params.contentEnglish,
       status: "review",
       sourceProvenance: {
-        addedBy: params.authorId,
+        addedBy: user.id,
         source: "Manual Documentation",
       },
     },
@@ -35,7 +37,7 @@ export async function submitKnowledgeDraft(params: SubmitDraftParams) {
   });
 
   await createAuditLog({
-    userId: params.authorId,
+    userId: user.id,
     entityId: item.id,
     entityType: "KnowledgeItem",
     action: "submit_draft",
@@ -47,7 +49,7 @@ export async function submitKnowledgeDraft(params: SubmitDraftParams) {
     },
   });
 
-  if (item.dataAsset.ownerId && item.dataAsset.ownerId !== params.authorId) {
+  if (item.dataAsset.ownerId && item.dataAsset.ownerId !== user.id) {
     await prisma.notification.create({
       data: {
         userId: item.dataAsset.ownerId,
@@ -69,9 +71,10 @@ export async function submitKnowledgeDraft(params: SubmitDraftParams) {
 
 export async function updateKnowledgeStatus(
   itemId: string,
-  newStatus: "approved" | "rejected",
-  reviewerId: string
+  newStatus: "approved" | "rejected"
 ) {
+  const user = await requireUser();
+
   const existing = await prisma.knowledgeItem.findUnique({
     where: { id: itemId },
   });
@@ -82,22 +85,22 @@ export async function updateKnowledgeStatus(
     where: { id: itemId },
     data: {
       status: newStatus,
-      reviewerId,
+      reviewerId: user.id,
       verifiedAt: newStatus === "approved" ? new Date() : undefined,
     },
     include: { author: true, reviewer: true, dataAsset: true },
   });
 
   await createAuditLog({
-    userId: reviewerId,
+    userId: user.id,
     entityId: itemId,
     entityType: "KnowledgeItem",
     action: `status_change_to_${newStatus}`,
     oldValue: { status: existing.status },
-    newValue: { status: newStatus, reviewerId },
+    newValue: { status: newStatus, reviewerId: user.id },
   });
 
-  if (existing.authorId !== reviewerId) {
+  if (existing.authorId !== user.id) {
     await prisma.notification.create({
       data: {
         userId: existing.authorId,
@@ -120,14 +123,16 @@ export async function updateKnowledgeStatus(
 
 // ─── Verify Freshness ───────────────────────────────────────────
 
-export async function verifyKnowledgeItem(itemId: string, userId: string) {
+export async function verifyKnowledgeItem(itemId: string) {
+  const user = await requireUser();
+
   const updated = await prisma.knowledgeItem.update({
     where: { id: itemId },
     data: { verifiedAt: new Date() },
   });
 
   await createAuditLog({
-    userId,
+    userId: user.id,
     entityId: itemId,
     entityType: "KnowledgeItem",
     action: "verify_freshness",

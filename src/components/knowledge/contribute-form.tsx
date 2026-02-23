@@ -115,7 +115,6 @@ export function ContributeForm({
       try {
         await submitKnowledgeDraft({
           dataAssetId: result.data.dataAssetId,
-          authorId: "demo-user-id",
           title: result.data.title,
           itemType: result.data.itemType,
           contentHebrew: result.data.contentHebrew,
