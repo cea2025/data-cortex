@@ -125,7 +125,7 @@ function Omnibar() {
         onValueChange={setQuery}
         dir="rtl"
       />
-      <CommandList className="max-h-[400px]">
+      <CommandList className="max-h-[60vh] sm:max-h-[400px]">
         <CommandEmpty>
           {isPending
             ? "מחפש…"

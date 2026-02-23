@@ -64,29 +64,20 @@ function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
                 key={item.id}
                 className="border-r-2 border-r-gold-400 hover:shadow-md transition-shadow rounded-xl"
               >
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex items-start gap-3">
-                    {/* Icon */}
                     <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-gold-100 text-gold-600 shrink-0">
                       <Icon className="h-4 w-4" />
                     </div>
 
-                    {/* Content */}
                     <div className="flex-1 min-w-0 space-y-1.5">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <h3 className="text-sm font-semibold truncate">{item.title}</h3>
+                        <h3 className="text-sm font-semibold">{item.title}</h3>
                         <Badge variant="outline" className="text-[10px]">
                           {KNOWLEDGE_TYPE_LABELS[item.itemType as KnowledgeItemType]}
                         </Badge>
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] bg-gold-100 text-gold-700"
-                        >
-                          ממתין לבדיקה
-                        </Badge>
                       </div>
 
-                      {/* Content preview */}
                       {item.contentHebrew && (
                         <p className="text-xs text-muted-foreground line-clamp-2" dir="rtl">
                           {item.contentHebrew}
@@ -98,8 +89,7 @@ function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
                         </p>
                       )}
 
-                      {/* Meta row */}
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-muted-foreground">
                         <Link
                           href={`/${orgSlug}/assets/${item.dataAsset.id}`}
                           className="inline-flex items-center gap-1 text-primary hover:underline"
@@ -110,7 +100,7 @@ function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
                           <User className="h-3 w-3" />
                           {item.author.displayName}
                         </span>
-                        <span className="inline-flex items-center gap-1">
+                        <span className="hidden sm:inline-flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {new Date(item.createdAt).toLocaleDateString("he-IL", {
                             day: "numeric",
@@ -123,7 +113,6 @@ function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="shrink-0">
                       <ReviewActions itemId={item.id} />
                     </div>
