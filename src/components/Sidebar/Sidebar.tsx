@@ -20,6 +20,7 @@ import { useUIStore } from "@/lib/store/ui-store";
 import { createBrowserClient } from "@supabase/ssr";
 import { useOrgSlug, useUserRole } from "@/lib/org-context";
 import OrgSwitcher from "@/components/org-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface NavItem {
   path: string;
@@ -113,6 +114,7 @@ function Sidebar() {
       </nav>
 
       <div className="p-2 border-t border-gray-200 dark:border-navy-800 flex flex-col gap-1">
+        <ThemeToggle collapsed={sidebarCollapsed} />
         <Button
           variant="ghost"
           size={sidebarCollapsed ? "icon" : "sm"}

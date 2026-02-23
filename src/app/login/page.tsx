@@ -16,13 +16,13 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4 bg-navy-950">
-      <Card className="w-full max-w-md">
+    <main className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-navy-950 dark:to-navy-900">
+      <Card className="w-full max-w-md shadow-xl border-gray-200 dark:border-navy-800">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-500/10">
-            <span className="heading-h1-bold text-teal-500">DC</span>
+            <span className="heading-h1-bold text-teal-600 dark:text-teal-500">DC</span>
           </div>
-          <CardTitle className="heading-h2-bold text-white">Data Cortex</CardTitle>
+          <CardTitle className="heading-h2-bold text-gray-900 dark:text-white">Data Cortex</CardTitle>
           <p className="text-sm text-muted-foreground mt-2">
             מנוע ממשל נתונים ואמון לבנקאות ליבה
           </p>

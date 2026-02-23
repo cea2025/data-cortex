@@ -48,7 +48,7 @@ export default async function DashboardLayout({
     <OrgProvider orgSlug={orgSlug} userRole={user.role} isSuperAdmin={user.isSuperAdmin}>
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-navy-950">{children}</main>
         <Omnibar />
       </div>
     </OrgProvider>
