@@ -4,6 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import type { UserProfile } from "@/generated/prisma/client";
 
+const SUPER_ADMIN_EMAILS = [
+  "cea@glb.org.il",
+  "a0504105090@gmail.com",
+];
+
 export async function getCurrentUser(): Promise<UserProfile | null> {
   const supabase = await createClient();
   const {
@@ -14,6 +19,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
 
   const email = user.email ?? "";
   const domain = email.split("@")[1] ?? "";
+  const isPreApprovedSuperAdmin = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
 
   let organizationId: string | undefined;
   const existing = await prisma.userProfile.findUnique({
@@ -40,6 +46,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
         "Unknown",
       avatarUrl: user.user_metadata?.avatar_url ?? null,
       ...(organizationId ? { organizationId } : {}),
+      ...(isPreApprovedSuperAdmin ? { isSuperAdmin: true, role: "admin", status: "ACTIVE" } : {}),
     },
     create: {
       id: user.id,
@@ -50,8 +57,9 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
         email ??
         "Unknown",
       avatarUrl: user.user_metadata?.avatar_url ?? null,
-      role: "viewer",
-      status: "PENDING",
+      role: isPreApprovedSuperAdmin ? "admin" : "viewer",
+      status: isPreApprovedSuperAdmin ? "ACTIVE" : "PENDING",
+      isSuperAdmin: isPreApprovedSuperAdmin,
       organizationId: organizationId ?? null,
     },
   });

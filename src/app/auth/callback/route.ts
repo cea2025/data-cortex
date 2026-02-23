@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 
+const SUPER_ADMIN_EMAILS = [
+  "cea@glb.org.il",
+  "a0504105090@gmail.com",
+];
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
@@ -17,6 +22,7 @@ export async function GET(request: Request) {
       if (user) {
         const email = user.email ?? "";
         const domain = email.split("@")[1] ?? "";
+        const isPreApprovedSuperAdmin = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
 
         let organizationId: string | null = null;
         let orgSlug: string | null = null;
@@ -43,6 +49,7 @@ export async function GET(request: Request) {
               "Unknown",
             avatarUrl: user.user_metadata?.avatar_url ?? null,
             ...(organizationId ? { organizationId } : {}),
+            ...(isPreApprovedSuperAdmin ? { isSuperAdmin: true, role: "admin", status: "ACTIVE" } : {}),
           },
           create: {
             id: user.id,
@@ -53,8 +60,9 @@ export async function GET(request: Request) {
               email ??
               "Unknown",
             avatarUrl: user.user_metadata?.avatar_url ?? null,
-            role: "viewer",
-            status: "PENDING",
+            role: isPreApprovedSuperAdmin ? "admin" : "viewer",
+            status: isPreApprovedSuperAdmin ? "ACTIVE" : "PENDING",
+            isSuperAdmin: isPreApprovedSuperAdmin,
             organizationId,
           },
         });
