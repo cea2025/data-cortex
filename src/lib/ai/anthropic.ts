@@ -1,59 +1,134 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { generateObject } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { createAuditLog } from "@/lib/audit";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const MODEL_VERSION = "claude-sonnet-4-20250514";
+
+const synthesisSchema = z.object({
+  synthesis: z
+    .string()
+    .describe("A concise Hebrew synthesis of the asset's role in the business logic"),
+  confidenceScore: z
+    .number()
+    .min(0)
+    .max(1)
+    .describe("Confidence score between 0 and 1"),
+  sourceKnowledgeIds: z
+    .array(z.string())
+    .describe("Array of knowledge item IDs that the synthesis is based on"),
 });
 
-interface SynthesizeParams {
-  assetName: string;
-  assetType: string;
-  knowledgeItems: {
-    id: string;
-    title: string;
-    content: string;
-    type: string;
-  }[];
-}
+export type SynthesisResult = z.infer<typeof synthesisSchema>;
 
-export async function synthesizeInsight(params: SynthesizeParams): Promise<{
-  synthesis: string;
-  confidence: number;
+export async function generateAssetSynthesis(assetId: string): Promise<{
+  insight: { id: string; synthesis: string; confidenceScore: number };
   sourceIds: string[];
 }> {
-  const knowledgeContext = params.knowledgeItems
-    .map((ki, i) => `[${i + 1}] (${ki.type}) ${ki.title}: ${ki.content}`)
-    .join("\n");
-
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 1024,
-    system: `You are a Core Banking data analyst assistant. Analyze the knowledge items about a database asset and provide a concise synthesis in Hebrew. Always reference which knowledge items you based your conclusions on using their numbers [1], [2], etc. Rate your confidence from 0 to 1.`,
-    messages: [
-      {
-        role: "user",
-        content: `Asset: ${params.assetName} (${params.assetType})\n\nKnowledge Items:\n${knowledgeContext}\n\nProvide:\n1. A synthesis paragraph in Hebrew\n2. Your confidence score (0-1)\n3. List of source item numbers used\n\nRespond in JSON format: { "synthesis": "...", "confidence": 0.85, "sourceIndices": [1, 2] }`,
+  const asset = await prisma.dataAsset.findUnique({
+    where: { id: assetId },
+    include: {
+      parent: { select: { tableName: true, schemaName: true, systemName: true } },
+      knowledgeItems: {
+        where: { status: "approved" },
+        include: { author: true },
+        orderBy: { createdAt: "desc" },
       },
-    ],
+    },
   });
 
-  const text = response.content[0].type === "text" ? response.content[0].text : "";
-  
-  try {
-    const parsed = JSON.parse(text);
-    const sourceIds = (parsed.sourceIndices || []).map(
-      (idx: number) => params.knowledgeItems[idx - 1]?.id
-    ).filter(Boolean);
+  if (!asset) throw new Error(`Asset ${assetId} not found`);
 
-    return {
-      synthesis: parsed.synthesis || text,
-      confidence: parsed.confidence || 0.5,
-      sourceIds,
-    };
-  } catch {
-    return {
-      synthesis: text,
-      confidence: 0.5,
-      sourceIds: params.knowledgeItems.map((ki) => ki.id),
-    };
+  const approvedItems = asset.knowledgeItems;
+  if (approvedItems.length === 0) {
+    throw new Error("No approved knowledge items to synthesize");
   }
+
+  const assetPath = [
+    asset.systemName,
+    asset.schemaName,
+    asset.tableName,
+    asset.columnName,
+  ]
+    .filter(Boolean)
+    .join(" > ");
+
+  const knowledgeContext = approvedItems
+    .map(
+      (ki, i) =>
+        `[${i + 1}] ID="${ki.id}" Type=${ki.itemType} Title="${ki.title}" ` +
+        `Hebrew="${ki.contentHebrew ?? ""}" English="${ki.contentEnglish ?? ""}" ` +
+        `Author=${ki.author.displayName} Status=${ki.status}`
+    )
+    .join("\n\n");
+
+  const idMap = approvedItems.map((ki) => ki.id);
+
+  const { object } = await generateObject({
+    model: anthropic(MODEL_VERSION),
+    schema: synthesisSchema,
+    system: `You are a Senior Data Architect specializing in Core Banking systems.
+Your task is to analyze a database asset's metadata along with human-provided knowledge items, and produce a synthesized summary of what this asset represents in the business domain.
+
+Rules:
+- Write the synthesis in Hebrew.
+- The synthesis should be 2-4 sentences explaining the business meaning, not just restating the column/table name.
+- If there are warnings or deprecations, mention them prominently.
+- If knowledge items conflict, note the conflict and lean toward the most recently verified item.
+- Reference which knowledge items you relied on by using their exact IDs in the sourceKnowledgeIds array.
+- Be honest about your confidence: high (>0.8) only when multiple consistent approved items exist.`,
+    prompt: `Asset Path: ${assetPath}
+Asset Type: ${asset.assetType}
+Data Type: ${asset.dataType ?? "N/A"}
+Hebrew Name: ${asset.hebrewName ?? "N/A"}
+Description: ${asset.description ?? "N/A"}
+
+Approved Knowledge Items:
+${knowledgeContext}
+
+Available Knowledge Item IDs: ${JSON.stringify(idMap)}
+
+Analyze this asset and its knowledge items. Return a structured synthesis.`,
+  });
+
+  await prisma.aIInsight.deleteMany({
+    where: { dataAssetId: assetId },
+  });
+
+  const insight = await prisma.aIInsight.create({
+    data: {
+      dataAssetId: assetId,
+      synthesis: object.synthesis,
+      confidenceScore: object.confidenceScore,
+      modelVersion: MODEL_VERSION,
+      sourceReferences: {
+        create: object.sourceKnowledgeIds
+          .filter((id) => idMap.includes(id))
+          .map((knowledgeItemId) => ({ knowledgeItemId })),
+      },
+    },
+  });
+
+  await createAuditLog({
+    userId: "system",
+    entityId: insight.id,
+    entityType: "AIInsight",
+    action: "generate_synthesis",
+    newValue: {
+      assetId,
+      confidenceScore: object.confidenceScore,
+      sourceCount: object.sourceKnowledgeIds.length,
+      modelVersion: MODEL_VERSION,
+    },
+  });
+
+  return {
+    insight: {
+      id: insight.id,
+      synthesis: object.synthesis,
+      confidenceScore: object.confidenceScore,
+    },
+    sourceIds: object.sourceKnowledgeIds,
+  };
 }

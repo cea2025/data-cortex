@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LtrText } from "@/components/ltr-text";
-import { Omnibar } from "@/components/omnibar";
 import { useUIStore } from "@/lib/store/ui-store";
 import { ASSET_TYPE_LABELS } from "@/types/domain";
 
@@ -22,12 +21,10 @@ interface TableAsset {
 }
 
 export function DashboardContent({ tables }: { tables: TableAsset[] }) {
-  const { setOmnibarOpen } = useUIStore();
+  const { openSearch } = useUIStore();
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      <Omnibar />
-
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Data Cortex</h1>
@@ -38,7 +35,7 @@ export function DashboardContent({ tables }: { tables: TableAsset[] }) {
         <Button
           variant="outline"
           className="gap-2 min-w-[240px] justify-start text-muted-foreground"
-          onClick={() => setOmnibarOpen(true)}
+          onClick={openSearch}
         >
           <Search className="h-4 w-4" />
           <span>חיפוש...</span>

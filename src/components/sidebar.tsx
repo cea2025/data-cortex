@@ -15,16 +15,15 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/lib/store/ui-store";
 
-const navItems = [
+const navLinks = [
   { href: "/", icon: LayoutDashboard, label: "לוח בקרה" },
-  { href: "/search", icon: Search, label: "חיפוש" },
   { href: "/contribute", icon: Plus, label: "הוסף ידע" },
   { href: "/notifications", icon: Bell, label: "התראות" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { sidebarCollapsed, toggleSidebar } = useUIStore();
+  const { sidebarCollapsed, toggleSidebar, openSearch } = useUIStore();
 
   return (
     <aside
@@ -41,7 +40,27 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 p-2 space-y-1">
-        {navItems.map((item) => {
+        {/* Search button – opens Omnibar */}
+        <button
+          onClick={openSearch}
+          className={cn(
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+            "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          )}
+        >
+          <Search className="h-5 w-5 shrink-0" />
+          {!sidebarCollapsed && (
+            <>
+              <span className="flex-1 text-start">חיפוש</span>
+              <kbd className="pointer-events-none hidden select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
+                Ctrl+K
+              </kbd>
+            </>
+          )}
+        </button>
+
+        {/* Navigation links */}
+        {navLinks.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link key={item.href} href={item.href}>
