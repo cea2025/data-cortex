@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
+import { isAdmin } from "@/lib/auth/utils";
 import { getAuditLogs, getAuditLogEntityTypes } from "@/app/actions/audit";
 import AuditLogViewer from "@/components/audit/audit-log-viewer";
 import styles from "./AuditPage.module.css";
@@ -10,6 +13,9 @@ export default async function AuditPage({
   params: Promise<{ orgSlug: string }>;
 }) {
   const { orgSlug } = await params;
+  const user = await getCurrentUser();
+  if (!user || !isAdmin(user)) redirect(`/${orgSlug}/`);
+
   const [{ logs, total }, entityTypes] = await Promise.all([
     getAuditLogs({ limit: 50, orgSlug }),
     getAuditLogEntityTypes(orgSlug),

@@ -1,10 +1,12 @@
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import Omnibar from "@/components/omnibar";
 import { OrgProvider } from "@/lib/org-context";
 import { getCurrentUser } from "@/lib/auth";
 import { getOrganizationBySlug } from "@/lib/org";
 import { prisma } from "@/lib/prisma";
+
+const STATIC_PATHS = new Set(["favicon.ico", "favicon.png", "robots.txt", "sitemap.xml"]);
 
 export default async function DashboardLayout({
   children,
@@ -15,13 +17,17 @@ export default async function DashboardLayout({
 }) {
   const { orgSlug } = await params;
 
+  if (STATIC_PATHS.has(orgSlug) || orgSlug.includes(".")) {
+    notFound();
+  }
+
   const [user, org] = await Promise.all([
     getCurrentUser(),
     getOrganizationBySlug(orgSlug),
   ]);
 
   if (!user) redirect("/login");
-  if (!org) redirect("/");
+  if (!org) notFound();
 
   if (!user.isSuperAdmin) {
     if (user.status === "PENDING") redirect("/pending");
