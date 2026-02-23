@@ -12,6 +12,8 @@ async function main() {
   console.log("🌱 Seeding Data Cortex database...\n");
 
   // Clean existing data in correct order (respects FK constraints)
+  await prisma.organizationRule.deleteMany();
+  await prisma.assetRelationship.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.aIInsightSource.deleteMany();
@@ -21,6 +23,18 @@ async function main() {
   await prisma.userProfile.deleteMany();
   console.log("🗑️  Cleared existing data");
 
+  // ─── ORGANIZATION ────────────────────────────────────────
+  const org = await prisma.organization.upsert({
+    where: { slug: "glb" },
+    update: {},
+    create: {
+      slug: "glb",
+      name: "Global Banking Corp",
+      domainMappings: ["gemach.local"],
+    },
+  });
+  console.log(`✅ Organization: ${org.name} (slug: ${org.slug})`);
+
   // ─── USERS ─────────────────────────────────────────────
   const adminUser = await prisma.userProfile.upsert({
     where: { email: "admin@datacortex.dev" },
@@ -29,7 +43,9 @@ async function main() {
       email: "admin@datacortex.dev",
       displayName: "דוד כהן",
       role: "admin",
+      status: "ACTIVE",
       avatarUrl: null,
+      organizationId: org.id,
     },
   });
 
@@ -40,7 +56,9 @@ async function main() {
       email: "contributor@datacortex.dev",
       displayName: "רונית לוי",
       role: "contributor",
+      status: "ACTIVE",
       avatarUrl: null,
+      organizationId: org.id,
     },
   });
 
@@ -54,6 +72,7 @@ async function main() {
       description: "Core Banking System – Legacy Mainframe",
       hebrewName: "מערכת בנקאות ליבה",
       ownerId: adminUser.id,
+      organizationId: org.id,
     },
   });
 
@@ -67,6 +86,7 @@ async function main() {
       hebrewName: "סכמה ראשית",
       parentId: coreSystem.id,
       ownerId: adminUser.id,
+      organizationId: org.id,
     },
   });
 
@@ -83,6 +103,7 @@ async function main() {
       hebrewName: "טבלת הלוואות ותיקי אשראי",
       parentId: dboSchema.id,
       ownerId: adminUser.id,
+      organizationId: org.id,
     },
   });
 
@@ -116,6 +137,7 @@ async function main() {
         description: col.description,
         parentId: loansTable.id,
         ownerId: adminUser.id,
+        organizationId: org.id,
       },
     });
     loanColAssets[col.columnName] = asset.id;
@@ -134,6 +156,7 @@ async function main() {
       hebrewName: "טבלת אנשי קשר ולקוחות",
       parentId: dboSchema.id,
       ownerId: adminUser.id,
+      organizationId: org.id,
     },
   });
 
@@ -167,6 +190,7 @@ async function main() {
         description: col.description,
         parentId: contactsTable.id,
         ownerId: adminUser.id,
+        organizationId: org.id,
       },
     });
     contactColAssets[col.columnName] = asset.id;
@@ -185,6 +209,7 @@ async function main() {
       hebrewName: "טבלת פקדונות",
       parentId: dboSchema.id,
       ownerId: adminUser.id,
+      organizationId: org.id,
     },
   });
 
@@ -212,6 +237,7 @@ async function main() {
         description: col.description,
         parentId: depositsTable.id,
         ownerId: adminUser.id,
+        organizationId: org.id,
       },
     });
   }
@@ -235,6 +261,7 @@ async function main() {
       reviewerId: contributorUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "admin@datacortex.dev", source: "Core Banking Operations Manual v4.1" },
+      organizationId: org.id,
     },
   });
 
@@ -252,6 +279,7 @@ async function main() {
       authorId: contributorUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "contributor@datacortex.dev", source: "Tribal Knowledge – R&D Investigation" },
+      organizationId: org.id,
     },
   });
 
@@ -270,6 +298,7 @@ async function main() {
       reviewerId: contributorUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "admin@datacortex.dev", source: "Architecture Decision Record #47" },
+      organizationId: org.id,
     },
   });
 
@@ -287,6 +316,7 @@ async function main() {
       authorId: contributorUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "contributor@datacortex.dev", source: "Batch Processing Runbook" },
+      organizationId: org.id,
     },
   });
 
@@ -304,6 +334,7 @@ async function main() {
       authorId: adminUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "admin@datacortex.dev", source: "Interest Calculation Module Docs v2" },
+      organizationId: org.id,
     },
   });
 
@@ -322,6 +353,7 @@ async function main() {
       reviewerId: contributorUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "admin@datacortex.dev", source: "System Documentation v3.2" },
+      organizationId: org.id,
     },
   });
 
@@ -339,6 +371,7 @@ async function main() {
       authorId: adminUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "admin@datacortex.dev", source: "Data Retention Policy – Legal Dept" },
+      organizationId: org.id,
     },
   });
 
@@ -356,6 +389,7 @@ async function main() {
       authorId: adminUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "admin@datacortex.dev", source: "GDPR Compliance Framework" },
+      organizationId: org.id,
     },
   });
 
@@ -372,6 +406,7 @@ async function main() {
       dataAssetId: contactColAssets["Kod_Mishpacha"],
       authorId: contributorUser.id,
       sourceProvenance: { addedBy: "contributor@datacortex.dev", source: "Team Standup Note – 15/01/2025" },
+      organizationId: org.id,
     },
   });
 
@@ -390,6 +425,7 @@ async function main() {
       reviewerId: contributorUser.id,
       verifiedAt: new Date(),
       sourceProvenance: { addedBy: "admin@datacortex.dev", source: "Risk Management Policy v6" },
+      organizationId: org.id,
     },
   });
 
@@ -401,6 +437,7 @@ async function main() {
       action: "CREATE",
       newValue: { tableName: "TBL_LN_CS", assetType: "table" },
       userId: adminUser.id,
+      organizationId: org.id,
     },
   });
 
