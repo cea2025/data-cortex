@@ -26,7 +26,7 @@ export default async function NotificationsPage({
   ]);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto flex flex-col gap-8" dir="rtl">
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto flex flex-col gap-5 sm:gap-8" dir="rtl">
       <section>
         <ReviewDashboard items={pendingItems} />
       </section>

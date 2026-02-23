@@ -55,10 +55,10 @@ function GlobalRulesView({ initialRules }: Props) {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto" dir="rtl">
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto" dir="rtl">
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-col gap-1">
-          <h1 className="heading-h2-bold text-foreground">כללים ארגוניים</h1>
+          <h1 className="heading-h3-bold sm:heading-h2-bold text-foreground">כללים ארגוניים</h1>
           <p className="body-medium-regular text-muted-foreground">
             הנחיות גלובליות החלות על כל מסדי הנתונים בארגון
           </p>

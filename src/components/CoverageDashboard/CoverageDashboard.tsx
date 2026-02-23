@@ -70,20 +70,20 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
   const orgSlug = useOrgSlug();
 
   return (
-    <div className="p-6 max-w-7xl mx-auto flex flex-col gap-8" dir="rtl">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto flex flex-col gap-5 sm:gap-8" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="heading-h1-bold text-gray-900 dark:text-cream-100">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="heading-h2-bold sm:heading-h1-bold text-gray-900 dark:text-cream-100">
             Data Cortex
           </h1>
-          <p className="body-medium-regular text-gray-500 dark:text-gray-400 mt-1">
+          <p className="body-small-regular sm:body-medium-regular text-gray-500 dark:text-gray-400 mt-0.5">
             לוח בקרה — כיסוי תיעוד מטא-דאטה
           </p>
         </div>
         <Button
           variant="outline"
-          className="min-w-[240px] justify-start text-gray-500 dark:text-gray-400 gap-2"
+          className="hidden sm:flex min-w-[240px] justify-start text-gray-500 dark:text-gray-400 gap-2"
           onClick={openSearch}
         >
           <Search size={16} />
@@ -95,70 +95,70 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="rounded-xl shadow-sm border-t-4 border-t-teal-500">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="body-medium-semibold">טבלאות</CardTitle>
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400">
-              <Table2 size={20} />
+          <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="body-small-semibold sm:body-medium-semibold">טבלאות</CardTitle>
+            <div className="flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400">
+              <Table2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="heading-h2-bold sm:heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
               {formatNumber(stats.totalTables)}
             </div>
-            <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-1">
+            <p className="body-tiny-regular sm:body-small-regular text-gray-500 dark:text-gray-400 mt-0.5">
               ב-{stats.systemBreakdown.length} מערכות
             </p>
           </CardContent>
         </Card>
 
         <Card className="rounded-xl shadow-sm border-t-4 border-t-blue-500">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="body-medium-semibold">עמודות</CardTitle>
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
-              <Columns3 size={20} />
+          <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="body-small-semibold sm:body-medium-semibold">עמודות</CardTitle>
+            <div className="flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+              <Columns3 className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="heading-h2-bold sm:heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
               {formatNumber(stats.totalColumns)}
             </div>
-            <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-1">
+            <p className="body-tiny-regular sm:body-small-regular text-gray-500 dark:text-gray-400 mt-0.5">
               עמודות ממופות
             </p>
           </CardContent>
         </Card>
 
         <Card className="rounded-xl shadow-sm border-t-4 border-t-emerald-500">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="body-medium-semibold">פריטי ידע מאושרים</CardTitle>
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
-              <BookOpen size={20} />
+          <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="body-small-semibold sm:body-medium-semibold">ידע מאושר</CardTitle>
+            <div className="flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="heading-h2-bold sm:heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
               {formatNumber(stats.totalKnowledgeItems)}
             </div>
-            <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-1">
+            <p className="body-tiny-regular sm:body-small-regular text-gray-500 dark:text-gray-400 mt-0.5">
               {stats.documentedAssetsCount} נכסים מתועדים
             </p>
           </CardContent>
         </Card>
 
         <Card className="rounded-xl shadow-sm border-t-4 border-t-amber-500">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="body-medium-semibold">כיסוי תיעוד</CardTitle>
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
-              <Target size={20} />
+          <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-6">
+            <CardTitle className="body-small-semibold sm:body-medium-semibold">כיסוי תיעוד</CardTitle>
+            <div className="flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
+              <Target className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="heading-h2-bold sm:heading-h1-bold text-gray-900 dark:text-cream-100 tabular-nums">
               {stats.coveragePercentage}%
             </div>
-            <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-1">
+            <p className="body-tiny-regular sm:body-small-regular text-gray-500 dark:text-gray-400 mt-0.5">
               מתוך {formatNumber(stats.totalTables + stats.totalColumns)} נכסים
             </p>
           </CardContent>
@@ -199,16 +199,18 @@ function CoverageDashboard({ stats }: { stats: DashboardStats }) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-4 mt-6 rounded-xl border border-dashed border-gold-400 bg-gold-50 dark:bg-gold-950/20">
-              <Sparkles size={20} className="shrink-0 text-amber-500" />
-              <div className="flex-1">
-                <p className="body-medium-semibold text-gray-900 dark:text-cream-100">עזרו לנו לתעד!</p>
-                <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-0.5">
-                  כל פריט ידע שתוסיפו משפר את ההבנה הארגונית של מבני הנתונים
-                </p>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 sm:p-4 mt-4 sm:mt-6 rounded-xl border border-dashed border-gold-400 bg-gold-50 dark:bg-gold-950/20">
+              <div className="flex items-center gap-3 flex-1">
+                <Sparkles size={20} className="shrink-0 text-amber-500" />
+                <div className="flex-1">
+                  <p className="body-medium-semibold text-gray-900 dark:text-cream-100">עזרו לנו לתעד!</p>
+                  <p className="body-small-regular text-gray-500 dark:text-gray-400 mt-0.5">
+                    כל פריט ידע שתוסיפו משפר את ההבנה הארגונית
+                  </p>
+                </div>
               </div>
-              <Link href={`/${orgSlug}/contribute`}>
-                <Button size="sm" className="gap-1.5">
+              <Link href={`/${orgSlug}/contribute`} className="w-full sm:w-auto">
+                <Button size="sm" className="gap-1.5 w-full sm:w-auto">
                   <BookOpen size={14} />
                   הוסף ידע
                 </Button>

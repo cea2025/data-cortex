@@ -2,10 +2,23 @@ import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
+import type { Viewport } from "next";
+
 export const metadata: Metadata = {
   title: "Data Cortex - Core Banking Knowledge Graph",
   description:
     "מנוע ממשל נתונים ואמון - מקור האמת היחיד לגישור בין מבני מסדי נתונים של בנקאות ליבה",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#060e20" },
+  ],
 };
 
 export default function RootLayout({

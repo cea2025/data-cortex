@@ -21,10 +21,10 @@ export default async function AuditPage({
   ]);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto" dir="rtl">
-      <div className="mb-6">
-        <h1 className="heading-h2-bold text-foreground">היסטוריית שינויים</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto" dir="rtl">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="heading-h3-bold sm:heading-h2-bold text-foreground">היסטוריית שינויים</h1>
+        <p className="text-sm text-muted-foreground mt-0.5 sm:mt-1">
           מעקב אחר כל הפעולות שבוצעו במערכת
         </p>
       </div>

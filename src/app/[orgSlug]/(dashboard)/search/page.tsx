@@ -73,8 +73,8 @@ export default function SearchPage() {
   const knowledge = results.filter(isKnowledge);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto flex flex-col gap-6">
-      <h1 className="heading-h2-bold text-foreground">חיפוש</h1>
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto flex flex-col gap-4 sm:gap-6">
+      <h1 className="heading-h3-bold sm:heading-h2-bold text-foreground">חיפוש</h1>
 
       <div className="relative">
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />

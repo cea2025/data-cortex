@@ -1,5 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import { MobileNav } from "@/components/mobile-nav";
 import Omnibar from "@/components/omnibar";
 import { OrgProvider } from "@/lib/org-context";
 import { getCurrentUser } from "@/lib/auth";
@@ -47,8 +48,13 @@ export default async function DashboardLayout({
   return (
     <OrgProvider orgSlug={orgSlug} userRole={user.role} isSuperAdmin={user.isSuperAdmin}>
       <div className="flex h-screen overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-navy-950">{children}</main>
+        {/* Desktop sidebar — hidden on mobile */}
+        <div className="hidden md:flex">
+          <Sidebar />
+        </div>
+        {/* Mobile navigation */}
+        <MobileNav />
+        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-navy-950 pb-20 md:pb-0">{children}</main>
         <Omnibar />
       </div>
     </OrgProvider>
