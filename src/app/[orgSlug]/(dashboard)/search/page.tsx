@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import styles from "./SearchPage.module.css";
 import {
   Search,
   Database,
@@ -73,11 +74,11 @@ export default function SearchPage() {
   const knowledge = results.filter(isKnowledge);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">חיפוש</h1>
+    <div className={styles.container}>
+      <h1 className={styles.title}>חיפוש</h1>
 
-      <div className="relative mb-6">
-        <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+      <div className={styles.inputWrapper}>
+        <Search className={styles.searchIcon} />
         <Input
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
@@ -87,28 +88,28 @@ export default function SearchPage() {
       </div>
 
       {isPending && (
-        <p className="text-sm text-muted-foreground text-center py-4">
+        <p className={styles.pendingText}>
           מחפש…
         </p>
       )}
 
       {assets.length > 0 && (
-        <div className="space-y-2 mb-6">
-          <h2 className="text-sm font-medium text-muted-foreground mb-2">נכסי מידע</h2>
+        <div className={styles.resultsSection}>
+          <h2 className={styles.sectionTitle}>נכסי מידע</h2>
           {assets.map((r) => {
             const Icon = assetIcons[r.type] ?? Database;
             return (
               <Card
                 key={r.id}
-                className="cursor-pointer hover:border-primary/50 transition-colors"
+                className={styles.card}
                 onClick={() => router.push(`/${orgSlug}/assets/${r.id}`)}
               >
-                <CardContent className="p-4 flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-muted/50 mt-0.5">
+                <CardContent className={styles.cardContent}>
+                  <div className={styles.iconWrap}>
                     <Icon className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                  <div className={styles.cardBody}>
+                    <div className={styles.cardTitleRow}>
                       <LtrText className="font-medium">{r.title}</LtrText>
                       {r.dataType && (
                         <LtrText className="text-xs text-muted-foreground">
@@ -116,7 +117,7 @@ export default function SearchPage() {
                         </LtrText>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5">
+                    <div className={styles.cardSubtitleRow}>
                       <LtrText className="text-xs text-muted-foreground">
                         {r.subtitle}
                       </LtrText>
@@ -127,7 +128,7 @@ export default function SearchPage() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className={styles.cardBadges}>
                     <Badge variant="outline" className="text-xs">
                       {ASSET_TYPE_LABELS[r.type as AssetType]}
                     </Badge>
@@ -146,22 +147,22 @@ export default function SearchPage() {
       )}
 
       {knowledge.length > 0 && (
-        <div className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground mb-2">ידע ארגוני</h2>
+        <div className={styles.resultsSectionLast}>
+          <h2 className={styles.sectionTitle}>ידע ארגוני</h2>
           {knowledge.map((r) => {
             const Icon = knowledgeIcons[r.knowledgeType] ?? BookOpen;
             return (
               <Card
                 key={r.id}
-                className="cursor-pointer hover:border-amber-500/50 transition-colors"
+                className={styles.cardKnowledge}
                 onClick={() => router.push(`/${orgSlug}/assets/${r.assetId}`)}
               >
-                <CardContent className="p-4 flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-500/10 mt-0.5">
+                <CardContent className={styles.cardContent}>
+                  <div className={styles.iconWrapKnowledge}>
                     <Icon className="h-4 w-4 text-amber-500" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                  <div className={styles.cardBody}>
+                    <div className={styles.cardTitleRow}>
                       <span className="font-medium">{r.title}</span>
                       <Badge
                         variant="outline"
@@ -170,7 +171,7 @@ export default function SearchPage() {
                         {KNOWLEDGE_TYPE_LABELS[r.knowledgeType]}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                    <p className={styles.snippet}>
                       {r.snippet}
                     </p>
                     <LtrText className="text-[11px] text-muted-foreground/60 mt-1">
@@ -185,8 +186,8 @@ export default function SearchPage() {
       )}
 
       {query.length >= 2 && !isPending && results.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
-          <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <div className={styles.emptyState}>
+          <Search className={styles.emptyIcon} />
           <p>לא נמצאו תוצאות עבור &quot;{query}&quot;</p>
         </div>
       )}

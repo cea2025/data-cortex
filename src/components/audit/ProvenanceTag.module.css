@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--font-secondary-default);
+  flex-wrap: wrap;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.author {
+  font-weight: 500;
+  color: var(--font-primary-subtle);
+}
+
+.separator {
+  color: var(--border-default);
+}
+
+.confidence {
+  font-family: var(--font-mono);
+  color: var(--font-brand);
+}
+
+.icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}

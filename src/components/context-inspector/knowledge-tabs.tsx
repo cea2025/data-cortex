@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,10 +12,20 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { KnowledgeItemCard } from "@/components/knowledge/item-card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import KnowledgeItemCard from "@/components/knowledge/item-card";
 import { AIEvidencePanel } from "@/components/context-inspector/ai-evidence";
-import { RelationshipsTab } from "@/components/context-inspector/relationships-tab";
-import { ContributeForm } from "@/components/knowledge/contribute-form";
+import RelationshipsTab from "@/components/context-inspector/relationships-tab";
+import ContributeForm from "@/components/knowledge/contribute-form";
+import { submitBulkKnowledge } from "@/app/actions/knowledge";
+import { useOrgSlug } from "@/lib/org-context";
+import { toast } from "sonner";
 import {
   BookOpen,
   AlertTriangle,
@@ -25,24 +35,46 @@ import {
   Lightbulb,
   ArrowLeftRight,
   Plus,
+  Crown,
+  GitBranch,
+  Loader2,
 } from "lucide-react";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
+import styles from "./KnowledgeTabs.module.css";
 
-export function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
+type TopTab = "knowledge" | "relationships" | "lineage";
+
+function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
   const router = useRouter();
+  const orgSlug = useOrgSlug();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [topTab, setTopTab] = useState<"knowledge" | "relationships">("knowledge");
+  const [sheetIsCanonical, setSheetIsCanonical] = useState(false);
+  const [topTab, setTopTab] = useState<TopTab>("knowledge");
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [bulkDuplicates, setBulkDuplicates] = useState<
+    { id: string; tableName: string | null }[]
+  >([]);
+  const [lastDraftData, setLastDraftData] = useState<{
+    title: string;
+    itemType: string;
+    contentHebrew?: string;
+    contentEnglish?: string;
+  } | null>(null);
+  const [isBulkPending, startBulkTransition] = useTransition();
 
   const directItems = asset.knowledgeItems;
   const childItems = asset.childKnowledgeItems ?? [];
   const allItems = [...directItems, ...childItems];
 
-  const businessRules = allItems.filter((i) => i.itemType === "business_rule");
-  const warnings = allItems.filter((i) => i.itemType === "warning");
-  const calculations = allItems.filter(
-    (i) => i.itemType === "calculation_logic"
-  );
-  const deprecations = allItems.filter((i) => i.itemType === "deprecation");
+  const canonicalItems = allItems.filter((i) => i.isCanonical);
+  const communityItems = allItems
+    .filter((i) => !i.isCanonical)
+    .sort((a, b) => (b.upvotes ?? 0) - (a.upvotes ?? 0));
+
+  const businessRules = communityItems.filter((i) => i.itemType === "business_rule");
+  const warnings = communityItems.filter((i) => i.itemType === "warning");
+  const calculations = communityItems.filter((i) => i.itemType === "calculation_logic");
+  const deprecations = communityItems.filter((i) => i.itemType === "deprecation");
 
   const totalKnowledge = allItems.length;
 
@@ -63,56 +95,118 @@ export function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
     asset.schemaName ??
     asset.systemName;
 
+  const handleProposeCanonical = () => {
+    setSheetIsCanonical(true);
+    setSheetOpen(true);
+  };
+
+  const handleAddKnowledge = () => {
+    setSheetIsCanonical(false);
+    setSheetOpen(true);
+  };
+
+  const handleBulkApply = () => {
+    if (!lastDraftData) return;
+    startBulkTransition(async () => {
+      try {
+        const result = await submitBulkKnowledge({
+          title: lastDraftData.title,
+          itemType: lastDraftData.itemType as "business_rule" | "warning" | "deprecation" | "calculation_logic",
+          contentHebrew: lastDraftData.contentHebrew,
+          contentEnglish: lastDraftData.contentEnglish,
+          assetIds: bulkDuplicates.map((d) => d.id),
+          orgSlug,
+        });
+        toast.success(`הגדרה רשמית הוחלה על ${result.count} עמודות נוספות`);
+        setBulkDialogOpen(false);
+        router.refresh();
+      } catch {
+        toast.error("שגיאה בהחלה המרובה");
+      }
+    });
+  };
+
+  // Lazy-load lineage graph
+  const LineageGraph = topTab === "lineage"
+    ? require("@/components/context-inspector/lineage-graph").default
+    : null;
+
   return (
-    <div className="flex flex-col h-full border-r border-border" dir="rtl">
+    <div className={styles.container} dir="rtl">
       {/* Top-level section switcher */}
-      <div className="flex border-b border-border bg-card">
+      <div className={styles.sectionSwitcher}>
         <button
           onClick={() => setTopTab("knowledge")}
-          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-            topTab === "knowledge"
-              ? "border-primary text-primary bg-background"
-              : "border-transparent text-muted-foreground hover:text-foreground"
+          className={`${styles.sectionBtn} body-small-semibold ${
+            topTab === "knowledge" ? styles.sectionBtnActive : styles.sectionBtnInactive
           }`}
         >
           <Lightbulb className="h-3.5 w-3.5" />
           ידע ארגוני
           {totalKnowledge > 0 && (
-            <span className="bg-muted rounded-full px-1.5 text-[10px] min-w-4 text-center">
-              {totalKnowledge}
-            </span>
+            <span className={`${styles.badge} body-tiny-regular`}>{totalKnowledge}</span>
           )}
         </button>
         <button
           onClick={() => setTopTab("relationships")}
-          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-            topTab === "relationships"
-              ? "border-teal-500 text-teal-600 dark:text-teal-400 bg-background"
-              : "border-transparent text-muted-foreground hover:text-foreground"
+          className={`${styles.sectionBtn} body-small-semibold ${
+            topTab === "relationships" ? styles.sectionBtnActiveRelationships : styles.sectionBtnInactive
           }`}
         >
           <ArrowLeftRight className="h-3.5 w-3.5" />
           קשרי גומלין
         </button>
+        <button
+          onClick={() => setTopTab("lineage")}
+          className={`${styles.sectionBtn} body-small-semibold ${
+            topTab === "lineage" ? styles.sectionBtnActiveLineage : styles.sectionBtnInactive
+          }`}
+        >
+          <GitBranch className="h-3.5 w-3.5" />
+          לינג׳ ויזואלי
+        </button>
       </div>
 
       {topTab === "knowledge" ? (
         <>
+          {/* Canonical Definition Section */}
+          <div className={styles.canonicalSection}>
+            <div className={`${styles.canonicalHeader} body-small-semibold`}>
+              <Crown className="h-4 w-4" />
+              הגדרה רשמית
+            </div>
+            {canonicalItems.length > 0 ? (
+              <div className={styles.tabsContentInner}>
+                {canonicalItems.map((item) => (
+                  <KnowledgeItemCard key={item.id} item={item} />
+                ))}
+              </div>
+            ) : (
+              <button
+                className={`${styles.proposeBtn} body-small-semibold`}
+                onClick={handleProposeCanonical}
+              >
+                <Crown className="h-4 w-4" />
+                הצע הגדרה רשמית
+              </button>
+            )}
+          </div>
+
+          {/* Community Notes header */}
+          <div className={`${styles.communityHeader} body-small-semibold`}>
+            <span>הערות קהילתיות ({communityItems.length})</span>
+          </div>
+
           {/* Knowledge panel header */}
-          <div className="px-4 py-3 border-b border-border bg-muted/30">
-            <div className="flex items-center gap-2">
+          <div className={styles.panelHeader}>
+            <div className={styles.headerInner}>
               <Lightbulb className="h-4 w-4 text-amber-500" />
-              <h2 className="text-sm font-semibold">ידע ארגוני</h2>
-              {totalKnowledge > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  {totalKnowledge} פריטים
-                </span>
-              )}
+              <h2 className="body-medium-semibold">ידע ארגוני</h2>
               <Button
                 variant="default"
                 size="sm"
-                className="mr-auto gap-1.5 text-xs"
-                onClick={() => setSheetOpen(true)}
+                className="mr-auto gap-1.5"
+                onClick={handleAddKnowledge}
               >
                 <Plus className="h-3.5 w-3.5" />
                 הוסף ידע
@@ -120,9 +214,9 @@ export function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
             </div>
           </div>
 
-          <Tabs defaultValue={defaultTab} className="flex flex-col flex-1 min-h-0">
-            <div className="border-b border-border px-3 pt-1 bg-card">
-              <TabsList className="w-full justify-start gap-0.5 bg-transparent h-auto p-0">
+          <Tabs defaultValue={defaultTab} className={styles.tabsRoot}>
+            <div className={styles.tabsHeader}>
+              <TabsList variant="line" className={styles.tabsList}>
                 <TabButton value="business_rule" count={businessRules.length}>
                   <BookOpen className="h-3.5 w-3.5" />
                   כללים
@@ -147,81 +241,166 @@ export function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
             </div>
 
             <ScrollArea className="flex-1">
-              <TabsContent value="business_rule" className="p-4 space-y-3 mt-0">
-                {businessRules.length === 0 ? (
-                  <EmptyState icon={BookOpen} label="אין כללים עסקיים" />
-                ) : (
-                  businessRules.map((item) => (
-                    <KnowledgeItemCard key={item.id} item={item} />
-                  ))
-                )}
+              <TabsContent value="business_rule" className={styles.tabsContent}>
+                <div className={styles.tabsContentInner}>
+                  {businessRules.length === 0 ? (
+                    <EmptyState icon={BookOpen} label="אין כללים עסקיים" />
+                  ) : (
+                    businessRules.map((item) => (
+                      <KnowledgeItemCard key={item.id} item={item} />
+                    ))
+                  )}
+                </div>
               </TabsContent>
 
-              <TabsContent value="warning" className="p-4 space-y-3 mt-0">
-                {warnings.length === 0 ? (
-                  <EmptyState icon={AlertTriangle} label="אין אזהרות" />
-                ) : (
-                  warnings.map((item) => (
-                    <KnowledgeItemCard key={item.id} item={item} />
-                  ))
-                )}
+              <TabsContent value="warning" className={styles.tabsContent}>
+                <div className={styles.tabsContentInner}>
+                  {warnings.length === 0 ? (
+                    <EmptyState icon={AlertTriangle} label="אין אזהרות" />
+                  ) : (
+                    warnings.map((item) => (
+                      <KnowledgeItemCard key={item.id} item={item} />
+                    ))
+                  )}
+                </div>
               </TabsContent>
 
-              <TabsContent value="calculation" className="p-4 space-y-3 mt-0">
-                {calculations.length === 0 ? (
-                  <EmptyState icon={Calculator} label="אין לוגיקת חישוב" />
-                ) : (
-                  calculations.map((item) => (
-                    <KnowledgeItemCard key={item.id} item={item} />
-                  ))
-                )}
+              <TabsContent value="calculation" className={styles.tabsContent}>
+                <div className={styles.tabsContentInner}>
+                  {calculations.length === 0 ? (
+                    <EmptyState icon={Calculator} label="אין לוגיקת חישוב" />
+                  ) : (
+                    calculations.map((item) => (
+                      <KnowledgeItemCard key={item.id} item={item} />
+                    ))
+                  )}
+                </div>
               </TabsContent>
 
-              <TabsContent value="deprecation" className="p-4 space-y-3 mt-0">
-                {deprecations.length === 0 ? (
-                  <EmptyState icon={Ban} label="אין פריטים שהוצאו משימוש" />
-                ) : (
-                  deprecations.map((item) => (
-                    <KnowledgeItemCard key={item.id} item={item} />
-                  ))
-                )}
+              <TabsContent value="deprecation" className={styles.tabsContent}>
+                <div className={styles.tabsContentInner}>
+                  {deprecations.length === 0 ? (
+                    <EmptyState icon={Ban} label="אין פריטים שהוצאו משימוש" />
+                  ) : (
+                    deprecations.map((item) => (
+                      <KnowledgeItemCard key={item.id} item={item} />
+                    ))
+                  )}
+                </div>
               </TabsContent>
 
-              <TabsContent value="ai" className="p-4 space-y-3 mt-0">
-                <AIEvidencePanel
-                  insights={asset.aiInsights}
-                  assetId={asset.id}
-                  hasApprovedKnowledge={allItems.some((i) => i.status === "approved")}
-                />
+              <TabsContent value="ai" className={styles.tabsContent}>
+                <div className={styles.tabsContentInner}>
+                  <AIEvidencePanel
+                    insights={asset.aiInsights}
+                    assetId={asset.id}
+                    hasApprovedKnowledge={allItems.some(
+                      (i) => i.status === "approved"
+                    )}
+                  />
+                </div>
               </TabsContent>
             </ScrollArea>
           </Tabs>
         </>
-      ) : (
+      ) : topTab === "relationships" ? (
         <RelationshipsTab assetId={asset.id} assetLabel={assetLabel} />
+      ) : (
+        LineageGraph && <LineageGraph assetId={asset.id} assetLabel={assetLabel} />
       )}
 
       {/* Contribute Sheet */}
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="left" className="w-full sm:max-w-lg overflow-y-auto" dir="rtl">
+      <Sheet
+        open={sheetOpen}
+        onOpenChange={(open) => {
+          setSheetOpen(open);
+          if (!open) setSheetIsCanonical(false);
+        }}
+      >
+        <SheetContent side="left" className={styles.sheetContent} dir="rtl">
           <SheetHeader>
-            <SheetTitle>הוספת פריט ידע</SheetTitle>
+            <SheetTitle>
+              {sheetIsCanonical ? "הצע הגדרה רשמית" : "הוספת פריט ידע"}
+            </SheetTitle>
             <SheetDescription>
-              הוסף כלל עסקי, אזהרה או תיעוד עבור הנכס הזה. הפריט יישלח לאישור הבעלים.
+              {sheetIsCanonical
+                ? "הגדרה רשמית היא ההגדרה המקובלת בארגון עבור נכס זה. היא תופיע בראש הדף."
+                : "הוסף כלל עסקי, אזהרה או תיעוד עבור הנכס הזה. הפריט יישלח לאישור הבעלים."}
             </SheetDescription>
           </SheetHeader>
-          <div className="px-4 pb-6">
+          <div className={styles.sheetInner}>
             <ContributeForm
               fixedAssetId={asset.id}
               fixedAssetLabel={assetLabel}
-              onSuccess={() => {
+              isCanonical={sheetIsCanonical}
+              onSuccess={(draftData) => {
                 setSheetOpen(false);
-                router.refresh();
+                if (
+                  draftData?.suggestBulk &&
+                  draftData.duplicateAssets &&
+                  draftData.duplicateAssets.length > 0
+                ) {
+                  setBulkDuplicates(draftData.duplicateAssets);
+                  setLastDraftData({
+                    title: draftData.title,
+                    itemType: draftData.itemType,
+                    contentHebrew: draftData.contentHebrew,
+                    contentEnglish: draftData.contentEnglish,
+                  });
+                  setBulkDialogOpen(true);
+                } else {
+                  router.refresh();
+                }
               }}
             />
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Bulk Apply Dialog */}
+      <Dialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
+        <DialogContent dir="rtl" className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>החלת הגדרה רשמית על עמודות נוספות</DialogTitle>
+            <DialogDescription>
+              מצאנו {bulkDuplicates.length} עמודות נוספות בשם{" "}
+              <strong>{asset.columnName}</strong> ללא הגדרה רשמית. האם להחיל
+              את ההגדרה גם עליהן?
+            </DialogDescription>
+          </DialogHeader>
+          <table className={styles.bulkTable}>
+            <thead>
+              <tr>
+                <th className="body-small-semibold">טבלה</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bulkDuplicates.map((d) => (
+                <tr key={d.id}>
+                  <td className="body-small-regular">{d.tableName ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className={styles.bulkActions}>
+            <Button
+              variant="outline"
+              onClick={() => setBulkDialogOpen(false)}
+              disabled={isBulkPending}
+            >
+              לא תודה
+            </Button>
+            <Button onClick={handleBulkApply} disabled={isBulkPending} className="gap-1.5">
+              {isBulkPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Crown className="h-4 w-4" />
+              )}
+              החל על {bulkDuplicates.length} עמודות
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -236,15 +415,10 @@ function TabButton({
   children: React.ReactNode;
 }) {
   return (
-    <TabsTrigger
-      value={value}
-      className="gap-1 text-xs px-2.5 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
-    >
+    <TabsTrigger value={value} className={`${styles.tabButton} body-small-semibold`}>
       {children}
       {count > 0 && (
-        <span className="bg-muted rounded-full px-1.5 text-[10px] min-w-4 text-center">
-          {count}
-        </span>
+        <span className={`${styles.badge} body-tiny-regular`}>{count}</span>
       )}
     </TabsTrigger>
   );
@@ -258,9 +432,11 @@ function EmptyState({
   label: string;
 }) {
   return (
-    <div className="text-center py-10 text-muted-foreground">
-      <Icon className="h-8 w-8 mx-auto mb-2 opacity-30" />
-      <p className="text-sm">{label}</p>
+    <div className={styles.emptyState}>
+      <Icon className={`h-8 w-8 ${styles.emptyStateIcon}`} />
+      <p className="body-medium-regular">{label}</p>
     </div>
   );
 }
+
+export default KnowledgeTabs;

@@ -1,0 +1,117 @@
+.root {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.metaSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.metaHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-sm) var(--space-lg);
+}
+
+.metaLabel {
+  composes: body-xsmall-bold from global;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--font-secondary-default);
+  white-space: nowrap;
+}
+
+.columnsSection {
+  margin-top: 0;
+}
+
+.columnsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.columnsTitle {
+  composes: body-medium-semibold from global;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tableWrapper {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+}
+
+.tableHead {
+  background: color-mix(in oklch, var(--muted) 40%, transparent);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.tableHeader {
+  composes: body-xsmall-bold from global;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--font-secondary-default);
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+}
+
+.tableHeaderCenter {
+  text-align: center;
+}
+
+.tableHeaderRight {
+  text-align: right;
+}
+
+.tableRow {
+  border-top: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+  transition: background-color 0.15s ease;
+}
+
+.tableRow:hover {
+  background: color-mix(in oklch, var(--primary) 5%, transparent);
+}
+
+.tableRowAlt {
+  background: color-mix(in oklch, var(--muted) 20%, transparent);
+}
+
+.tableRowAlt:hover {
+  background: color-mix(in oklch, var(--primary) 5%, transparent);
+}
+
+.tableCell {
+  padding: var(--space-sm) var(--space-md);
+}
+
+.tableCellCenter {
+  text-align: center;
+}
+
+.tableCellRight {
+  text-align: right;
+}
+
+.parentBreadcrumb {
+  padding-top: var(--space-md);
+  border-top: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+}

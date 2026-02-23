@@ -1,39 +1,38 @@
 import { User, FileText, Cpu } from "lucide-react";
 import type { SourceProvenance } from "@/types/domain";
+import styles from "./ProvenanceTag.module.css";
 
 interface ProvenanceTagProps {
   provenance: unknown;
   author: { displayName: string; email: string };
 }
 
-export function ProvenanceTag({ provenance, author }: ProvenanceTagProps) {
+function ProvenanceTag({ provenance, author }: ProvenanceTagProps) {
   const prov = provenance as SourceProvenance | null;
 
   return (
-    <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-      <span className="inline-flex items-center gap-1">
-        <User className="h-3 w-3 shrink-0" />
-        <span className="font-medium text-foreground/70">
-          {author.displayName}
-        </span>
+    <div className={styles.container}>
+      <span className={styles.item}>
+        <User className={styles.icon} />
+        <span className={styles.author}>{author.displayName}</span>
       </span>
       {prov?.source && (
         <>
-          <span className="text-border">|</span>
-          <span className="inline-flex items-center gap-1">
-            <FileText className="h-3 w-3 shrink-0" />
+          <span className={styles.separator}>|</span>
+          <span className={styles.item}>
+            <FileText className={styles.icon} />
             {prov.source}
           </span>
         </>
       )}
       {prov?.generatedBy && (
         <>
-          <span className="text-border">|</span>
-          <span className="inline-flex items-center gap-1">
-            <Cpu className="h-3 w-3 shrink-0" />
+          <span className={styles.separator}>|</span>
+          <span className={styles.item}>
+            <Cpu className={styles.icon} />
             {prov.generatedBy}
             {prov.confidence != null && (
-              <span className="text-primary font-mono">
+              <span className={styles.confidence}>
                 ({Math.round(prov.confidence * 100)}%)
               </span>
             )}
@@ -43,3 +42,5 @@ export function ProvenanceTag({ provenance, author }: ProvenanceTagProps) {
     </div>
   );
 }
+
+export default ProvenanceTag;

@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { resolveOrgId } from "@/lib/org";
+import { requireAdmin } from "@/lib/auth/rbac";
 
 interface AuditLogFilters {
   entityType?: string;
@@ -13,6 +14,8 @@ interface AuditLogFilters {
 }
 
 export async function getAuditLogs(filters: AuditLogFilters = {}) {
+  await requireAdmin();
+
   const { entityType, action, userId, limit = 50, offset = 0, orgSlug } = filters;
 
   const where: Record<string, unknown> = {};
@@ -36,6 +39,8 @@ export async function getAuditLogs(filters: AuditLogFilters = {}) {
 }
 
 export async function getAuditLogEntityTypes(orgSlug?: string) {
+  await requireAdmin();
+
   const where: Record<string, unknown> = {};
   if (orgSlug) where.organizationId = await resolveOrgId(orgSlug);
 

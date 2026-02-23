@@ -6,12 +6,12 @@ import {
 } from "@/components/ui/tooltip";
 import {
   getFreshnessLevel,
-  getFreshnessColor,
   getFreshnessLabel,
   getDaysSinceVerification,
   type FreshnessLevel,
 } from "@/lib/utils/freshness";
 import { cn } from "@/lib/utils";
+import styles from "./FreshnessIndicator.module.css";
 
 interface FreshnessIndicatorProps {
   verifiedAt: string | null;
@@ -25,12 +25,18 @@ const freshnessIcons: Record<FreshnessLevel, typeof Clock> = {
   unverified: ShieldAlert,
 };
 
-export function FreshnessIndicator({
+const levelStyles: Record<FreshnessLevel, string> = {
+  fresh: styles.fresh,
+  aging: styles.aging,
+  stale: styles.stale,
+  unverified: styles.unverified,
+};
+
+function FreshnessIndicator({
   verifiedAt,
   updatedAt,
 }: FreshnessIndicatorProps) {
   const level = getFreshnessLevel(verifiedAt, updatedAt);
-  const color = getFreshnessColor(level);
   const label = getFreshnessLabel(level);
   const days = getDaysSinceVerification(verifiedAt, updatedAt);
   const Icon = freshnessIcons[level];
@@ -38,17 +44,8 @@ export function FreshnessIndicator({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span
-          className={cn(
-            "inline-flex items-center gap-1 text-xs rounded-full px-2 py-0.5",
-            level === "unverified" && "bg-destructive/10",
-            level === "stale" && "bg-orange-500/10",
-            level === "aging" && "bg-warning/10",
-            level === "fresh" && "bg-success/10",
-            color
-          )}
-        >
-          <Icon className="h-3 w-3" />
+        <span className={cn(styles.trigger, levelStyles[level])}>
+          <Icon className={styles.icon} />
           {label}
         </span>
       </TooltipTrigger>
@@ -57,17 +54,17 @@ export function FreshnessIndicator({
           {verifiedAt ? "אומת לפני" : "עודכן לפני"} {days} ימים
         </p>
         {level === "unverified" && (
-          <p className="text-destructive text-xs mt-1">
+          <p className={styles.tooltipDestructive}>
             לא אומת מעל 12 חודשים — נדרש אימות חוזר
           </p>
         )}
         {level === "stale" && (
-          <p className="text-orange-500 text-xs mt-1">
+          <p className={styles.tooltipStale}>
             המידע מתיישן — מומלץ לאמת מחדש
           </p>
         )}
         {!verifiedAt && level !== "unverified" && (
-          <p className="text-muted-foreground text-xs mt-1">
+          <p className={styles.tooltipMuted}>
             טרם אומת על ידי בעלים
           </p>
         )}
@@ -75,3 +72,5 @@ export function FreshnessIndicator({
     </Tooltip>
   );
 }
+
+export default FreshnessIndicator;

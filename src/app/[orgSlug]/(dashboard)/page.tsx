@@ -1,5 +1,5 @@
 import { getDashboardStats } from "@/app/actions/analytics";
-import { CoverageDashboard } from "@/components/coverage-dashboard";
+import CoverageDashboard from "@/components/CoverageDashboard/CoverageDashboard";
 
 export const dynamic = "force-dynamic";
 

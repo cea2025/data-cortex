@@ -32,7 +32,7 @@ export async function GET(request: Request) {
           }
         }
 
-        await prisma.userProfile.upsert({
+        const profile = await prisma.userProfile.upsert({
           where: { id: user.id },
           update: {
             email,
@@ -53,12 +53,21 @@ export async function GET(request: Request) {
               email ??
               "Unknown",
             avatarUrl: user.user_metadata?.avatar_url ?? null,
-            role: "contributor",
+            role: "viewer",
+            status: "PENDING",
             organizationId,
           },
         });
 
         const redirectBase = getRedirectBase(request, origin);
+
+        if (profile.status === "PENDING") {
+          return NextResponse.redirect(`${redirectBase}/pending`);
+        }
+        if (profile.status === "SUSPENDED") {
+          return NextResponse.redirect(`${redirectBase}/suspended`);
+        }
+
         const redirectPath = orgSlug ? `/${orgSlug}/` : "/";
         return NextResponse.redirect(`${redirectBase}${redirectPath}`);
       }

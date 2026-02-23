@@ -1,0 +1,52 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-sm);
+}
+
+.fresh {
+  background-color: var(--surface-success);
+  color: var(--font-success);
+}
+
+.aging {
+  background-color: var(--surface-warning);
+  color: var(--font-warning);
+}
+
+.stale {
+  background-color: var(--surface-amber);
+  color: var(--font-amber);
+}
+
+.unverified {
+  background-color: var(--surface-danger);
+  color: var(--font-danger);
+}
+
+.icon {
+  width: 12px;
+  height: 12px;
+}
+
+.tooltipDestructive {
+  color: var(--font-danger);
+  font-size: 0.75rem;
+  margin-top: var(--space-xs);
+}
+
+.tooltipStale {
+  color: var(--font-amber);
+  font-size: 0.75rem;
+  margin-top: var(--space-xs);
+}
+
+.tooltipMuted {
+  color: var(--font-secondary-default);
+  font-size: 0.75rem;
+  margin-top: var(--space-xs);
+}

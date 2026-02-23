@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getAssetWithKnowledge } from "@/app/actions/assets";
-import { ContextInspector } from "@/components/context-inspector/context-inspector";
+import ContextInspector from "@/components/context-inspector/context-inspector";
 
 export default async function AssetPage({
   params,

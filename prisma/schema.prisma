@@ -40,6 +40,12 @@ enum UserRole {
   viewer
 }
 
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
 // ──────────────────────────────────────────────────
 // Organization (Multi-Tenant Root)
 // ──────────────────────────────────────────────────
@@ -57,6 +63,7 @@ model Organization {
   aiInsights         AIInsight[]
   auditLogs          AuditLog[]
   assetRelationships AssetRelationship[]
+  organizationRules  OrganizationRule[]
 
   @@map("organizations")
 }
@@ -66,14 +73,18 @@ model Organization {
 // ──────────────────────────────────────────────────
 
 model UserProfile {
-  id           String   @id @default(uuid()) @db.Uuid
-  email        String   @unique
-  displayName  String   @map("display_name")
-  avatarUrl    String?  @map("avatar_url")
-  role         UserRole @default(viewer)
-  isSuperAdmin Boolean  @default(false) @map("is_super_admin")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id               String     @id @default(uuid()) @db.Uuid
+  email            String     @unique
+  displayName      String     @map("display_name")
+  avatarUrl        String?    @map("avatar_url")
+  role             UserRole   @default(viewer)
+  status           UserStatus @default(PENDING)
+  isSuperAdmin     Boolean    @default(false) @map("is_super_admin")
+  isServiceAccount Boolean    @default(false) @map("is_service_account")
+  aiCallsCount     Int        @default(0) @map("ai_calls_count")
+  aiTokensUsed     Int        @default(0) @map("ai_tokens_used")
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
 
   organizationId String?       @map("organization_id") @db.Uuid
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -83,7 +94,8 @@ model UserProfile {
   reviewedItems      KnowledgeItem[]     @relation("KnowledgeReviewer")
   auditLogs          AuditLog[]
   notifications      Notification[]
-  assetRelationships AssetRelationship[]
+  assetRelationships  AssetRelationship[]
+  organizationRules   OrganizationRule[]
 
   @@index([organizationId])
   @@map("user_profiles")
@@ -142,6 +154,8 @@ model KnowledgeItem {
   contentHebrew   String?           @map("content_hebrew")
   contentEnglish  String?           @map("content_english")
   sourceProvenance Json?            @map("source_provenance")
+  isCanonical     Boolean           @default(false) @map("is_canonical")
+  upvotes         Int               @default(0)
   verifiedAt      DateTime?         @map("verified_at")
   createdAt       DateTime          @default(now()) @map("created_at")
   updatedAt       DateTime          @updatedAt @map("updated_at")
@@ -229,6 +243,25 @@ model AssetRelationship {
   @@index([targetAssetId])
   @@index([organizationId])
   @@map("asset_relationships")
+}
+
+// ──────────────────────────────────────────────────
+// Core: OrganizationRule (Global DB Rules)
+// ──────────────────────────────────────────────────
+
+model OrganizationRule {
+  id        String   @id @default(uuid()) @db.Uuid
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  authorId String      @map("author_id") @db.Uuid
+  author   UserProfile @relation(fields: [authorId], references: [id])
+
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@map("organization_rules")
 }
 
 // ──────────────────────────────────────────────────

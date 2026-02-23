@@ -5,8 +5,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { SchemaViewer } from "./schema-viewer";
-import { KnowledgeTabs } from "./knowledge-tabs";
+import SchemaViewer from "./schema-viewer";
+import KnowledgeTabs from "./knowledge-tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,6 +24,7 @@ import { ASSET_TYPE_LABELS } from "@/types/domain";
 import type { AssetType } from "@/types/domain";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
 import { useOrgSlug } from "@/lib/org-context";
+import styles from "./ContextInspector.module.css";
 
 const typeIcons: Record<AssetType, typeof Server> = {
   system: Server,
@@ -32,7 +33,7 @@ const typeIcons: Record<AssetType, typeof Server> = {
   column: Columns3,
 };
 
-export function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
+function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
   const { openSearch } = useUIStore();
   const orgSlug = useOrgSlug();
   const TypeIcon = typeIcons[asset.assetType as AssetType] ?? Database;
@@ -46,9 +47,9 @@ export function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
     asset.knowledgeItems.length + (asset.childKnowledgeItems?.length ?? 0);
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className={styles.container}>
       {/* Header Bar */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm">
+      <div className={styles.headerBar}>
         <Link href={`/${orgSlug}/`}>
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <ArrowRight className="h-4 w-4" />
@@ -56,7 +57,7 @@ export function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
         </Link>
 
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary/10 text-primary">
+          <div className={styles.typeIconContainer}>
             <TypeIcon className="h-4 w-4" />
           </div>
           <div className="min-w-0">
@@ -76,7 +77,7 @@ export function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
           </div>
         </div>
 
-        <div className="mr-auto flex items-center gap-2">
+        <div className={styles.autoMargin}>
           {knowledgeCount > 0 && (
             <Badge variant="secondary" className="gap-1 text-xs">
               {knowledgeCount} פריטי ידע
@@ -97,7 +98,7 @@ export function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
         >
           <Search className="h-3.5 w-3.5" />
           <span>חיפוש</span>
-          <kbd className="pointer-events-none hidden select-none rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground sm:inline">
+          <kbd className={styles.searchKbd}>
             Ctrl+K
           </kbd>
         </Button>
@@ -116,3 +117,5 @@ export function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
     </div>
   );
 }
+
+export default ContextInspector;

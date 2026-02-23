@@ -1,5 +1,6 @@
 import { getTableAssets } from "@/app/actions/assets";
-import { ContributeForm } from "@/components/knowledge/contribute-form";
+import ContributeForm from "@/components/knowledge/contribute-form";
+import styles from "./ContributePage.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -11,9 +12,9 @@ export default async function ContributePage({
   const { orgSlug } = await params;
   const tables = await getTableAssets(orgSlug);
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-2">הוספת פריט ידע</h1>
-      <p className="text-muted-foreground mb-6">
+    <div className={styles.container}>
+      <h1 className={styles.title}>הוספת פריט ידע</h1>
+      <p className={styles.description}>
         שתפו ידע על טבלאות, עמודות ולוגיקה עסקית. הפריט יישלח לבדיקת הבעלים.
       </p>
       <ContributeForm tables={tables} />

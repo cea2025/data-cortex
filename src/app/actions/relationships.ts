@@ -95,6 +95,7 @@ export async function getAssetRelationships(
   outgoing: AssetRelationshipWithDetails[];
   incoming: AssetRelationshipWithDetails[];
 }> {
+  await requireUser();
   const organizationId = await resolveOrgId(orgSlug);
 
   const [outgoing, incoming] = await Promise.all([
@@ -144,6 +145,7 @@ export async function searchAssetsForRelationship(
   orgSlug: string,
   excludeId?: string
 ) {
+  await requireUser();
   if (!query || query.length < 2) return [];
 
   const organizationId = await resolveOrgId(orgSlug);

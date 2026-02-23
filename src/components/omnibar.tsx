@@ -37,6 +37,7 @@ import {
   KNOWLEDGE_TYPE_LABELS,
   type KnowledgeItemType,
 } from "@/types/domain";
+import styles from "./Omnibar.module.css";
 
 const assetTypeIcons = {
   system: Server,
@@ -60,7 +61,7 @@ function isKnowledgeResult(r: SearchResult): r is KnowledgeSearchResult {
   return r.type === "knowledge";
 }
 
-export function Omnibar() {
+function Omnibar() {
   const { isSearchOpen, setSearchOpen, closeSearch } = useUIStore();
   const orgSlug = useOrgSlug();
   const [query, setQuery] = useState("");
@@ -145,38 +146,38 @@ export function Omnibar() {
                   key={r.id}
                   value={`${r.title} ${r.hebrewName ?? ""} ${r.subtitle}`}
                   onSelect={() => navigateToAsset(r.id)}
-                  className="flex items-center gap-3 py-3 cursor-pointer"
+                  className={styles.commandItem}
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted">
-                    <Icon className="h-4 w-4 text-muted-foreground" />
+                  <div className={styles.iconContainer}>
+                    <Icon />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <LtrText className="text-sm font-semibold truncate">
+                  <div className={styles.contentWrapper}>
+                    <div className={styles.titleRow}>
+                      <LtrText className={styles.titleText}>
                         {r.title}
                       </LtrText>
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
+                      <Badge variant="outline" className={styles.badgeSmall}>
                         {ASSET_TYPE_LABELS[r.type] ?? r.type}
                       </Badge>
                       {r.dataType && (
-                        <LtrText className="text-[11px] text-muted-foreground shrink-0">
+                        <LtrText className={styles.dataTypeText}>
                           {r.dataType}
                         </LtrText>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <LtrText className="text-xs text-muted-foreground truncate">
+                    <div className={styles.subtitleRow}>
+                      <LtrText className={styles.subtitleText}>
                         {r.subtitle}
                       </LtrText>
                       {r.hebrewName && (
-                        <span className="text-xs text-muted-foreground truncate">
+                        <span className={styles.subtitleText}>
                           · {r.hebrewName}
                         </span>
                       )}
                     </div>
                   </div>
                   {r.knowledgeCount > 0 && (
-                    <Badge variant="secondary" className="shrink-0 gap-1">
+                    <Badge variant="secondary" className={styles.badgeKnowledgeCount}>
                       <BookOpen className="h-3 w-3" />
                       {r.knowledgeCount}
                     </Badge>
@@ -201,27 +202,27 @@ export function Omnibar() {
                   key={r.id}
                   value={`${r.title} ${r.snippet} ${r.assetPath}`}
                   onSelect={() => navigateToAsset(r.assetId)}
-                  className="flex items-center gap-3 py-3 cursor-pointer"
+                  className={styles.commandItem}
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-500/10">
-                    <Icon className="h-4 w-4 text-amber-500" />
+                  <div className={styles.knowledgeIconContainer}>
+                    <Icon />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold truncate">
+                  <div className={styles.contentWrapper}>
+                    <div className={styles.titleRow}>
+                      <span className={styles.titleText}>
                         {r.title}
                       </span>
                       <Badge
                         variant="outline"
-                        className="text-[10px] px-1.5 py-0 shrink-0 border-amber-500/30 text-amber-500"
+                        className={`${styles.badgeSmall} ${styles.badgeKnowledge}`}
                       >
                         {KNOWLEDGE_TYPE_LABELS[r.knowledgeType]}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                    <p className={styles.snippetText}>
                       {r.snippet}
                     </p>
-                    <LtrText className="text-[11px] text-muted-foreground/60 mt-0.5 truncate">
+                    <LtrText className={styles.assetPathText}>
                       {r.assetPath}
                     </LtrText>
                   </div>
@@ -234,3 +235,5 @@ export function Omnibar() {
     </CommandDialog>
   );
 }
+
+export default Omnibar;

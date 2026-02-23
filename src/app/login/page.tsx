@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
   const handleGoogleLogin = async () => {
@@ -16,14 +17,14 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-            <span className="text-3xl font-bold text-primary">DC</span>
+    <main className={styles.main}>
+      <Card className={styles.card}>
+        <CardHeader className={styles.header}>
+          <div className={styles.logoCircle}>
+            <span className={styles.logoText}>DC</span>
           </div>
-          <CardTitle className="text-2xl">Data Cortex</CardTitle>
-          <p className="text-muted-foreground mt-2">
+          <CardTitle className={styles.title}>Data Cortex</CardTitle>
+          <p className={styles.description}>
             מנוע ממשל נתונים ואמון לבנקאות ליבה
           </p>
         </CardHeader>
@@ -31,9 +32,9 @@ export default function LoginPage() {
           <Button
             onClick={handleGoogleLogin}
             variant="outline"
-            className="w-full h-12 text-base gap-3"
+            className={styles.loginButton}
           >
-            <svg viewBox="0 0 24 24" className="h-5 w-5">
+            <svg viewBox="0 0 24 24" className={styles.googleIcon}>
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
                 fill="#4285F4"

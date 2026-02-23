@@ -1,0 +1,17 @@
+.container {
+  padding: var(--space-xl);
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.title {
+  composes: heading-h2-bold from global;
+  margin-bottom: var(--space-sm);
+}
+
+.description {
+  composes: body-medium-regular from global;
+  color: var(--font-secondary-default);
+  margin-bottom: var(--space-xl);
+}

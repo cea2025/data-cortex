@@ -1,0 +1,131 @@
+.content {
+  max-width: 32rem;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.header {
+  padding: var(--space-xl) var(--space-2xl) var(--space-md);
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 1rem;
+}
+
+.searchStep {
+  border-top: 1px solid var(--border-default);
+}
+
+.searchList {
+  max-height: 320px;
+}
+
+.searchingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  color: var(--font-secondary-default);
+  gap: var(--space-sm);
+}
+
+.detailsStep {
+  padding: var(--space-lg) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  border-top: 1px solid var(--border-default);
+}
+
+.summaryBox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklch, var(--muted) 40%, transparent);
+  border: 1px dashed var(--border-default);
+}
+
+.summaryCell {
+  flex: 1;
+  text-align: center;
+}
+
+.summaryLabel {
+  composes: body-tiny-regular from global;
+  color: var(--font-secondary-default);
+  margin-bottom: 2px;
+}
+
+.summaryValue {
+  composes: body-medium-semibold from global;
+}
+
+.summaryPath {
+  composes: body-tiny-regular from global;
+  color: var(--font-secondary-default);
+  display: block;
+}
+
+.summaryIcon {
+  color: var(--icon-teal);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.resultItem {
+  cursor: pointer;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.resultIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.75rem;
+  width: 1.75rem;
+  border-radius: var(--radius-small);
+  background: color-mix(in oklch, var(--muted) 60%, transparent);
+  color: var(--icon-secondary-default);
+  flex-shrink: 0;
+}
+
+.resultBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.resultHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.resultPath {
+  composes: body-xsmall-regular from global;
+  color: var(--font-secondary-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.footer {
+  padding: var(--space-lg) var(--space-2xl);
+  border-top: 1px solid var(--border-default);
+  background: color-mix(in oklch, var(--muted) 20%, transparent);
+}
+
+.footerBack {
+  margin-inline-start: auto;
+}

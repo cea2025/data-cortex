@@ -31,6 +31,7 @@ import {
   getColumnConflictStatus,
   type ConflictStatus,
 } from "@/lib/utils/conflict-resolver";
+import styles from "./SchemaViewer.module.css";
 
 const typeIcons: Record<AssetType, typeof Server> = {
   system: Server,
@@ -60,7 +61,7 @@ const conflictLabels: Record<ConflictStatus, string> = {
   empty: "",
 };
 
-export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
+function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
   const orgSlug = useOrgSlug();
   const TypeIcon = typeIcons[asset.assetType as AssetType] ?? Database;
 
@@ -76,26 +77,26 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
 
   return (
     <ScrollArea className="h-full" dir="ltr">
-      <div className="p-5 space-y-5">
+      <div className={styles.root}>
         {/* Metadata Header */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 mb-1">
+        <div className={styles.metaSection}>
+          <div className={styles.metaHeader}>
             <TypeIcon className="h-4 w-4 text-primary" />
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <span className="body-xsmall-bold uppercase tracking-wider text-muted-foreground">
               {ASSET_TYPE_LABELS[asset.assetType as AssetType]} Metadata
             </span>
           </div>
 
-          <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+          <div className={`${styles.metaGrid} body-small-regular`}>
             <MetaLabel>System</MetaLabel>
-            <LtrText className="font-semibold text-foreground">
+            <LtrText className="body-small-semibold text-foreground">
               {asset.systemName}
             </LtrText>
 
             {asset.schemaName && (
               <>
                 <MetaLabel>Schema</MetaLabel>
-                <LtrText className="font-semibold text-foreground">
+                <LtrText className="body-small-semibold text-foreground">
                   {asset.schemaName}
                 </LtrText>
               </>
@@ -103,7 +104,7 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
             {asset.tableName && (
               <>
                 <MetaLabel>Table</MetaLabel>
-                <LtrText className="font-semibold text-foreground">
+                <LtrText className="body-small-semibold text-foreground">
                   {asset.tableName}
                 </LtrText>
               </>
@@ -111,7 +112,7 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
             {asset.columnName && (
               <>
                 <MetaLabel>Column</MetaLabel>
-                <LtrText className="font-semibold text-foreground">
+                <LtrText className="body-small-semibold text-foreground">
                   {asset.columnName}
                 </LtrText>
               </>
@@ -119,21 +120,23 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
             {asset.dataType && (
               <>
                 <MetaLabel>Data Type</MetaLabel>
-                <LtrText className="font-medium text-teal-500">
+                <span className="body-medium-regular text-teal-500">
                   {asset.dataType}
-                </LtrText>
+                </span>
               </>
             )}
             {asset.description && (
               <>
                 <MetaLabel>Description</MetaLabel>
-                <span className="text-foreground">{asset.description}</span>
+                <span className="body-small-regular text-foreground">
+                  {asset.description}
+                </span>
               </>
             )}
             {asset.hebrewName && (
               <>
                 <MetaLabel>Hebrew</MetaLabel>
-                <span className="text-foreground" dir="rtl">
+                <span className="body-small-regular text-foreground" dir="rtl">
                   {asset.hebrewName}
                 </span>
               </>
@@ -141,7 +144,7 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
             {asset.owner && (
               <>
                 <MetaLabel>Owner</MetaLabel>
-                <span className="text-foreground" dir="rtl">
+                <span className="body-small-regular text-foreground" dir="rtl">
                   {asset.owner.displayName}
                 </span>
               </>
@@ -151,9 +154,9 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
 
         {/* Column Grid (for table assets) */}
         {asset.children && asset.children.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold flex items-center gap-2">
+          <div className={styles.columnsSection}>
+            <div className={styles.columnsHeader}>
+              <h3 className={styles.columnsTitle}>
                 <Columns3 className="h-4 w-4 text-primary" />
                 Columns
               </h3>
@@ -163,24 +166,17 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
               </Badge>
             </div>
 
-            <div className="border rounded-lg overflow-hidden">
-              <table className="w-full text-sm">
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
                 <thead>
-                  <tr className="bg-muted/40 border-b">
-                    <th className="text-center px-2 py-2.5 w-8" />
-                    <th className="text-left px-3 py-2.5 font-medium text-xs uppercase tracking-wider text-muted-foreground">
-                      Column
-                    </th>
-                    <th className="text-left px-3 py-2.5 font-medium text-xs uppercase tracking-wider text-muted-foreground">
-                      Type
-                    </th>
-                    <th
-                      className="text-right px-3 py-2.5 font-medium text-xs uppercase tracking-wider text-muted-foreground"
-                      dir="rtl"
-                    >
+                  <tr className={styles.tableHead}>
+                    <th className={`${styles.tableHeader} ${styles.tableHeaderCenter} w-8`} />
+                    <th className={styles.tableHeader}>Column</th>
+                    <th className={styles.tableHeader}>Type</th>
+                    <th className={`${styles.tableHeader} ${styles.tableHeaderRight}`} dir="rtl">
                       שם עברי
                     </th>
-                    <th className="text-center px-3 py-2.5 font-medium text-xs uppercase tracking-wider text-muted-foreground w-16">
+                    <th className={`${styles.tableHeader} ${styles.tableHeaderCenter} w-16`}>
                       <BookOpen className="h-3.5 w-3.5 mx-auto" />
                     </th>
                   </tr>
@@ -207,11 +203,11 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
                     return (
                       <tr
                         key={col.id}
-                        className={`border-t border-border/50 hover:bg-primary/5 transition-colors group ${
-                          idx % 2 === 0 ? "" : "bg-muted/20"
+                        className={`${styles.tableRow} group ${
+                          idx % 2 === 0 ? "" : styles.tableRowAlt
                         }`}
                       >
-                        <td className="px-2 py-2.5 text-center">
+                        <td className={`${styles.tableCell} ${styles.tableCellCenter}`}>
                           {conflict.status !== "empty" && (
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -220,13 +216,13 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
                                 </span>
                               </TooltipTrigger>
                               <TooltipContent dir="rtl" className="max-w-48">
-                                <p className="text-xs">
+                                <p className="body-small-regular">
                                   {conflict.hasDeprecation
                                     ? "הוצא משימוש"
                                     : conflictLabels[conflict.status]}
                                 </p>
                                 {conflict.approvedCount > 0 && (
-                                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                                  <p className="body-tiny-regular text-muted-foreground mt-0.5">
                                     {conflict.approvedCount} מאושרים מתוך{" "}
                                     {conflict.totalCount}
                                   </p>
@@ -235,28 +231,28 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
                             </Tooltip>
                           )}
                         </td>
-                        <td className="px-3 py-2.5">
+                        <td className={styles.tableCell}>
                           <Link
                             href={`/${orgSlug}/assets/${col.id}`}
                             className="inline-flex items-center gap-1.5 text-primary hover:underline"
                           >
-                            <LtrText className="font-mono text-xs font-medium">
+                            <LtrText className="body-xsmall-bold font-mono">
                               {col.columnName}
                             </LtrText>
                             <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
                           </Link>
                         </td>
-                        <td className="px-3 py-2.5">
-                          <LtrText className="text-xs text-teal-500 font-mono">
+                        <td className={styles.tableCell}>
+                          <LtrText className="body-xsmall-regular text-teal-500 font-mono">
                             {col.dataType}
                           </LtrText>
                         </td>
-                        <td className="px-3 py-2.5 text-right" dir="rtl">
-                          <span className="text-xs text-muted-foreground">
+                        <td className={`${styles.tableCell} ${styles.tableCellRight}`} dir="rtl">
+                          <span className="body-xsmall-regular text-muted-foreground">
                             {col.hebrewName}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 text-center">
+                        <td className={`${styles.tableCell} ${styles.tableCellCenter}`}>
                           {knowledgeCount > 0 && (
                             <Badge
                               variant="secondary"
@@ -277,8 +273,8 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
 
         {/* Parent breadcrumb */}
         {asset.parent && (
-          <div className="pt-3 border-t border-border/50">
-            <p className="text-xs text-muted-foreground" dir="rtl">
+          <div className={styles.parentBreadcrumb}>
+            <p className="body-xsmall-regular text-muted-foreground" dir="rtl">
               חלק מ:{" "}
               <Link
                 href={`/${orgSlug}/assets/${asset.parent.id}`}
@@ -299,9 +295,7 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
 }
 
 function MetaLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">
-      {children}
-    </span>
-  );
+  return <span className={styles.metaLabel}>{children}</span>;
 }
+
+export default SchemaViewer;

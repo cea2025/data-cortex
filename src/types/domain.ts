@@ -6,6 +6,20 @@ export type KnowledgeItemType =
   | "calculation_logic";
 export type KnowledgeStatus = "draft" | "review" | "approved" | "rejected";
 export type UserRole = "admin" | "owner" | "contributor" | "viewer";
+export type UserStatus = "PENDING" | "ACTIVE" | "SUSPENDED";
+
+export const USER_STATUS_LABELS: Record<UserStatus, string> = {
+  PENDING: "ממתין לאישור",
+  ACTIVE: "פעיל",
+  SUSPENDED: "מושעה",
+};
+
+export const USER_ROLE_LABELS: Record<UserRole, string> = {
+  admin: "מנהל",
+  owner: "בעלים",
+  contributor: "תורם",
+  viewer: "צופה",
+};
 
 export interface Organization {
   id: string;
@@ -52,6 +66,8 @@ export interface KnowledgeItemWithAuthor {
   contentHebrew: string | null;
   contentEnglish: string | null;
   sourceProvenance: SourceProvenance | null;
+  isCanonical: boolean;
+  upvotes: number;
   verifiedAt: string | null;
   dataAssetId: string;
   authorId: string;
@@ -61,6 +77,15 @@ export interface KnowledgeItemWithAuthor {
   reviewer?: UserProfileBasic | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface OrganizationRuleItem {
+  id: string;
+  content: string;
+  authorId: string;
+  organizationId: string;
+  author: UserProfileBasic;
+  createdAt: string;
 }
 
 export interface AIInsightWithSources {
@@ -82,7 +107,11 @@ export interface UserProfileBasic {
   displayName: string;
   avatarUrl: string | null;
   role: UserRole;
+  status: UserStatus;
   isSuperAdmin: boolean;
+  isServiceAccount: boolean;
+  aiCallsCount: number;
+  aiTokensUsed: number;
   organizationId?: string | null;
 }
 

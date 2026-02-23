@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { updateKnowledgeStatus } from "@/app/actions/knowledge";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import styles from "./ReviewActions.module.css";
 
 interface ReviewActionsProps {
   itemId: string;
 }
 
-export function ReviewActions({ itemId }: ReviewActionsProps) {
+function ReviewActions({ itemId }: ReviewActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -30,11 +31,11 @@ export function ReviewActions({ itemId }: ReviewActionsProps) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={styles.container}>
       <Button
         size="sm"
         variant="default"
-        className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700"
+        className={styles.approveBtn}
         disabled={isPending}
         onClick={() => handleAction("approved")}
       >
@@ -48,7 +49,7 @@ export function ReviewActions({ itemId }: ReviewActionsProps) {
       <Button
         size="sm"
         variant="outline"
-        className="gap-1.5 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
+        className={styles.rejectBtn}
         disabled={isPending}
         onClick={() => handleAction("rejected")}
       >
@@ -62,3 +63,5 @@ export function ReviewActions({ itemId }: ReviewActionsProps) {
     </div>
   );
 }
+
+export default ReviewActions;

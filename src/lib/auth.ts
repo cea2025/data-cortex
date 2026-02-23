@@ -50,7 +50,8 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
         email ??
         "Unknown",
       avatarUrl: user.user_metadata?.avatar_url ?? null,
-      role: "contributor",
+      role: "viewer",
+      status: "PENDING",
       organizationId: organizationId ?? null,
     },
   });

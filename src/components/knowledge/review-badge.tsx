@@ -2,18 +2,21 @@ import { Badge } from "@/components/ui/badge";
 import { KNOWLEDGE_STATUS_LABELS } from "@/types/domain";
 import type { KnowledgeStatus } from "@/types/domain";
 import { cn } from "@/lib/utils";
+import styles from "./ReviewBadge.module.css";
 
 const statusVariants: Record<string, string> = {
-  draft: "bg-muted text-muted-foreground",
-  review: "bg-warning/20 text-warning",
-  approved: "bg-success/20 text-success",
-  rejected: "bg-destructive/20 text-destructive",
+  draft: styles.draft,
+  review: styles.review,
+  approved: styles.approved,
+  rejected: styles.rejected,
 };
 
-export function ReviewBadge({ status }: { status: string }) {
+function ReviewBadge({ status }: { status: string }) {
   return (
-    <Badge className={cn("text-xs", statusVariants[status])}>
+    <Badge className={cn(styles.badge, statusVariants[status] ?? styles.draft)}>
       {KNOWLEDGE_STATUS_LABELS[status as KnowledgeStatus] ?? status}
     </Badge>
   );
 }
+
+export default ReviewBadge;

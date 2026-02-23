@@ -1,0 +1,25 @@
+.badge {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+/* Status variants using design tokens */
+.draft {
+  background-color: var(--surface-secondary-default);
+  color: var(--font-secondary-default);
+}
+
+.review {
+  background-color: var(--surface-warning);
+  color: var(--font-warning);
+}
+
+.approved {
+  background-color: var(--surface-success);
+  color: var(--font-success);
+}
+
+.rejected {
+  background-color: var(--surface-danger);
+  color: var(--font-danger);
+}

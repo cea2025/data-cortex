@@ -1,0 +1,15 @@
+.wrapper {
+  padding: var(--space-sm) var(--space-sm);
+}
+
+.trigger {
+  composes: body-small-regular from global;
+  height: 32px;
+  gap: var(--space-sm);
+}
+
+.triggerIcon {
+  height: 14px;
+  width: 14px;
+  flex-shrink: 0;
+}

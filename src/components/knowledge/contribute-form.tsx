@@ -20,6 +20,7 @@ import { KNOWLEDGE_TYPE_LABELS } from "@/types/domain";
 import { useOrgSlug } from "@/lib/org-context";
 import { toast } from "sonner";
 import { Send, Loader2 } from "lucide-react";
+import styles from "./ContributeForm.module.css";
 
 // ─── Zod Schema ─────────────────────────────────────────────────
 
@@ -61,19 +62,30 @@ type TableWithCounts = TableAsset & {
   _count: { knowledgeItems: number; children: number };
 };
 
+interface BulkSuggestionData {
+  suggestBulk?: boolean;
+  duplicateAssets?: { id: string; tableName: string | null }[];
+  title: string;
+  itemType: string;
+  contentHebrew?: string;
+  contentEnglish?: string;
+}
+
 interface ContributeFormProps {
   tables?: TableWithCounts[];
   fixedAssetId?: string;
   fixedAssetLabel?: string;
-  onSuccess?: () => void;
+  isCanonical?: boolean;
+  onSuccess?: (data?: BulkSuggestionData) => void;
 }
 
 // ─── Component ──────────────────────────────────────────────────
 
-export function ContributeForm({
+function ContributeForm({
   tables,
   fixedAssetId,
   fixedAssetLabel,
+  isCanonical,
   onSuccess,
 }: ContributeFormProps) {
   const router = useRouter();
@@ -115,17 +127,25 @@ export function ContributeForm({
 
     startTransition(async () => {
       try {
-        await submitKnowledgeDraft({
+        const response = await submitKnowledgeDraft({
           dataAssetId: result.data.dataAssetId,
           title: result.data.title,
           itemType: result.data.itemType,
           contentHebrew: result.data.contentHebrew,
           contentEnglish: result.data.contentEnglish,
+          isCanonical: isCanonical ?? false,
           orgSlug,
         });
         toast.success("פריט הידע נשלח לבדיקה בהצלחה");
         if (onSuccess) {
-          onSuccess();
+          onSuccess({
+            suggestBulk: response.suggestBulk,
+            duplicateAssets: response.duplicateAssets,
+            title: result.data.title,
+            itemType: result.data.itemType,
+            contentHebrew: result.data.contentHebrew,
+            contentEnglish: result.data.contentEnglish,
+          });
         } else {
           router.push(`/${orgSlug}/assets/${result.data.dataAssetId}`);
         }
@@ -136,7 +156,7 @@ export function ContributeForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" dir="rtl">
+    <form onSubmit={handleSubmit} className={styles.form} dir="rtl">
       {/* Asset Selection — hidden if pre-bound */}
       {!fixedAssetId && tables && (
         <>
@@ -155,8 +175,8 @@ export function ContributeForm({
                 {tables.map((t) => (
                   <SelectItem key={t.id} value={t.id}>
                     <div className="flex items-center gap-2">
-                      <LtrText className="text-sm">{t.tableName}</LtrText>
-                      <span className="text-xs text-muted-foreground">
+                      <LtrText className="body-small-regular">{t.tableName}</LtrText>
+                      <span className="body-xsmall-regular text-muted-foreground">
                         {t.hebrewName}
                       </span>
                     </div>
@@ -183,11 +203,11 @@ export function ContributeForm({
                   {selectedTableObj.children.map((col) => (
                     <SelectItem key={col.id} value={col.id}>
                       <div className="flex items-center gap-2">
-                        <LtrText className="text-xs font-mono">
+                        <LtrText className="body-xsmall-regular font-mono">
                           {col.columnName}
                         </LtrText>
                         {col.hebrewName && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="body-xsmall-regular text-muted-foreground">
                             {col.hebrewName}
                           </span>
                         )}
@@ -203,7 +223,7 @@ export function ContributeForm({
 
       {fixedAssetId && fixedAssetLabel && (
         <FieldGroup label="נכס מידע">
-          <div className="px-3 py-2 bg-muted/50 rounded-md border text-sm">
+          <div className={styles.fixedAssetDisplay}>
             <LtrText>{fixedAssetLabel}</LtrText>
           </div>
         </FieldGroup>
@@ -297,15 +317,17 @@ function FieldGroup({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-sm font-medium">
+    <div className={styles.fieldGroup}>
+      <Label className={styles.fieldLabel}>
         {label}
         {required && <span className="text-destructive mr-1">*</span>}
       </Label>
       {children}
       {error && (
-        <p className="text-xs text-destructive">{error}</p>
+        <p className={styles.errorText}>{error}</p>
       )}
     </div>
   );
 }
+
+export default ContributeForm;

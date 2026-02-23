@@ -1,0 +1,120 @@
+.commandItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  padding-bottom: var(--space-md);
+  cursor: pointer;
+}
+
+.iconContainer {
+  display: flex;
+  height: 32px;
+  width: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-medium);
+  background: var(--muted);
+}
+
+.iconContainer svg {
+  height: 16px;
+  width: 16px;
+  color: var(--icon-secondary-default);
+}
+
+.badgeSmall {
+  font-size: 10px;
+  padding: 0 var(--space-sm);
+  flex-shrink: 0;
+}
+
+.knowledgeIconContainer {
+  display: flex;
+  height: 32px;
+  width: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-medium);
+  background: var(--surface-amber);
+}
+
+.knowledgeIconContainer svg {
+  height: 16px;
+  width: 16px;
+  color: var(--icon-amber);
+}
+
+.badgeKnowledge {
+  flex-shrink: 0;
+  border-color: var(--border-amber);
+  color: var(--font-amber);
+}
+
+.contentWrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.subtitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.titleText {
+  composes: body-medium-semibold from global;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subtitleText {
+  composes: body-small-regular from global;
+  color: var(--font-secondary-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dataTypeText {
+  composes: body-xsmall-regular from global;
+  color: var(--font-secondary-default);
+  flex-shrink: 0;
+}
+
+.snippetText {
+  composes: body-small-regular from global;
+  color: var(--font-secondary-default);
+  margin-top: var(--space-xs);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.assetPathText {
+  composes: body-xsmall-regular from global;
+  color: var(--font-secondary-default);
+  opacity: 0.6;
+  margin-top: var(--space-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badgeKnowledgeCount {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}

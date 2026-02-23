@@ -36,11 +36,16 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAuthPage = pathname.startsWith("/login");
   const isCallback = pathname.startsWith("/auth/callback");
+  const isStatusPage = pathname === "/pending" || pathname === "/suspended";
 
-  if (!user && !isAuthPage && !isCallback) {
+  if (!user && !isAuthPage && !isCallback && !isStatusPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  if (user && isStatusPage) {
+    return supabaseResponse;
   }
 
   if (user && isAuthPage) {

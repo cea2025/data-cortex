@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LtrText } from "@/components/ltr-text";
-import { ReviewActions } from "./review-actions";
+import ReviewActions from "./review-actions";
 import { KNOWLEDGE_TYPE_LABELS } from "@/types/domain";
 import type { KnowledgeItemType } from "@/types/domain";
 import type { PendingReviewItem } from "@/app/actions/knowledge";
@@ -18,6 +18,7 @@ import {
   User,
   Clock,
 } from "lucide-react";
+import styles from "./ReviewDashboard.module.css";
 
 const typeIcons: Record<KnowledgeItemType, typeof BookOpen> = {
   business_rule: BookOpen,
@@ -26,13 +27,13 @@ const typeIcons: Record<KnowledgeItemType, typeof BookOpen> = {
   calculation_logic: Calculator,
 };
 
-export function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
+function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
   const orgSlug = useOrgSlug();
   return (
     <div>
-      <div className="flex items-center gap-3 mb-4">
+      <div className={styles.header}>
         <ClipboardCheck className="h-5 w-5 text-primary" />
-        <h2 className="text-xl font-bold">ממתינים לאישור</h2>
+        <h2 className={styles.headerTitle}>ממתינים לאישור</h2>
         {items.length > 0 && (
           <Badge variant="secondary" className="text-xs">
             {items.length}
@@ -42,14 +43,14 @@ export function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
 
       {items.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <ClipboardCheck className="h-10 w-10 mx-auto mb-3 opacity-30" />
-            <p className="text-sm">אין פריטים הממתינים לבדיקה</p>
-            <p className="text-xs mt-1">כל פריטי הידע מעודכנים ומאושרים</p>
+          <CardContent className={styles.emptyCard}>
+            <ClipboardCheck className={`h-10 w-10 ${styles.emptyIcon}`} />
+            <p className={styles.emptyTitle}>אין פריטים הממתינים לבדיקה</p>
+            <p className={styles.emptySubtitle}>כל פריטי הידע מעודכנים ומאושרים</p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className={styles.list}>
           {items.map((item) => {
             const Icon =
               typeIcons[item.itemType as KnowledgeItemType] ?? BookOpen;
@@ -62,25 +63,25 @@ export function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
             return (
               <Card
                 key={item.id}
-                className="border-r-2 border-r-amber-400 hover:shadow-md transition-shadow"
+                className={styles.reviewCard}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-3">
+                <CardContent className={styles.cardContent}>
+                  <div className={styles.cardInner}>
                     {/* Icon */}
-                    <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-amber-600 shrink-0 mt-0.5">
+                    <div className={styles.iconContainer}>
                       <Icon className="h-4 w-4" />
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-sm font-semibold">{item.title}</h3>
+                    <div className={styles.cardBody}>
+                      <div className={styles.cardHeader}>
+                        <h3 className={styles.cardTitle}>{item.title}</h3>
                         <Badge variant="outline" className="text-[10px]">
                           {KNOWLEDGE_TYPE_LABELS[item.itemType as KnowledgeItemType]}
                         </Badge>
                         <Badge
                           variant="secondary"
-                          className="text-[10px] bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-400"
+                          className={`text-[10px] ${styles.pendingBadge}`}
                         >
                           ממתין לבדיקה
                         </Badge>
@@ -88,32 +89,29 @@ export function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
 
                       {/* Content preview */}
                       {item.contentHebrew && (
-                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                        <p className={styles.contentPreview} dir="rtl">
                           {item.contentHebrew}
                         </p>
                       )}
                       {item.contentEnglish && !item.contentHebrew && (
-                        <p
-                          className="text-sm text-muted-foreground leading-relaxed line-clamp-2"
-                          dir="ltr"
-                        >
+                        <p className={styles.contentPreview} dir="ltr">
                           {item.contentEnglish}
                         </p>
                       )}
 
                       {/* Meta row */}
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+                      <div className={styles.metaRow}>
                         <Link
                           href={`/${orgSlug}/assets/${item.dataAsset.id}`}
                           className="inline-flex items-center gap-1 text-primary hover:underline"
                         >
-                          <LtrText className="text-xs">{assetName}</LtrText>
+                          <LtrText className="body-xsmall-regular">{assetName}</LtrText>
                         </Link>
-                        <span className="inline-flex items-center gap-1">
+                        <span className={styles.metaItem}>
                           <User className="h-3 w-3" />
                           {item.author.displayName}
                         </span>
-                        <span className="inline-flex items-center gap-1">
+                        <span className={styles.metaItem}>
                           <Clock className="h-3 w-3" />
                           {new Date(item.createdAt).toLocaleDateString("he-IL", {
                             day: "numeric",
@@ -140,3 +138,5 @@ export function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
     </div>
   );
 }
+
+export default ReviewDashboard;

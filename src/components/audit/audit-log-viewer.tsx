@@ -21,7 +21,7 @@ import {
   Loader2,
   User,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import styles from "./AuditLogViewer.module.css";
 
 interface AuditLog {
   id: string;
@@ -59,7 +59,7 @@ const ENTITY_TYPE_LABELS: Record<string, string> = {
   AIInsight: "תובנת AI",
 };
 
-export function AuditLogViewer({
+function AuditLogViewer({
   initialLogs,
   totalCount,
   entityTypes,
@@ -102,12 +102,12 @@ export function AuditLogViewer({
   };
 
   return (
-    <div className="space-y-4">
+    <div className={styles.container}>
       {/* Filters */}
-      <div className="flex items-center gap-3">
-        <Filter className="h-4 w-4 text-muted-foreground" />
+      <div className={styles.filtersRow}>
+        <Filter className={styles.filterIcon} />
         <Select value={entityTypeFilter} onValueChange={applyFilter}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className={styles.selectTrigger}>
             <SelectValue placeholder="סנן לפי סוג..." />
           </SelectTrigger>
           <SelectContent>
@@ -119,24 +119,24 @@ export function AuditLogViewer({
             ))}
           </SelectContent>
         </Select>
-        <span className="text-sm text-muted-foreground mr-auto">
+        <span className={`body-medium-regular ${styles.countLabel}`}>
           {total} רשומות
         </span>
       </div>
 
       {/* Log List */}
       {logs.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <History className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          <p>אין רשומות</p>
+        <div className={styles.emptyState}>
+          <History className={styles.emptyStateIcon} />
+          <p className="body-medium-regular">אין רשומות</p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className={styles.logList}>
           {logs.map((log) => (
-            <Card key={log.id} className="transition-colors hover:bg-accent/30">
-              <CardContent className="p-4">
+            <Card key={log.id} className={styles.card}>
+              <CardContent className={styles.cardContent}>
                 <div
-                  className="flex items-start gap-3 cursor-pointer"
+                  className={styles.logRow}
                   onClick={() =>
                     setExpandedId(expandedId === log.id ? null : log.id)
                   }
@@ -146,18 +146,18 @@ export function AuditLogViewer({
                       <img
                         src={log.user.avatarUrl}
                         alt=""
-                        className="h-7 w-7 rounded-full"
+                        className={styles.avatarImg}
                       />
                     ) : (
-                      <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
-                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <div className={styles.avatarFallback}>
+                        <User className={styles.avatarIcon} />
                       </div>
                     )}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium">
+                    <div className={styles.badgesRow}>
+                      <span className="body-medium-semibold">
                         {log.user.displayName}
                       </span>
                       <Badge variant="secondary" className="text-xs">
@@ -167,7 +167,7 @@ export function AuditLogViewer({
                         {ENTITY_TYPE_LABELS[log.entityType] ?? log.entityType}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className={`body-small-regular ${styles.timestamp}`}>
                       {new Date(log.createdAt).toLocaleDateString("he-IL", {
                         year: "numeric",
                         month: "short",
@@ -179,11 +179,11 @@ export function AuditLogViewer({
                     </p>
                   </div>
 
-                  <div className="shrink-0 text-muted-foreground">
+                  <div className={`shrink-0 ${styles.chevronWrapper}`}>
                     {expandedId === log.id ? (
-                      <ChevronUp className="h-4 w-4" />
+                      <ChevronUp className={styles.chevronIcon} />
                     ) : (
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className={styles.chevronIcon} />
                     )}
                   </div>
                 </div>
@@ -199,7 +199,7 @@ export function AuditLogViewer({
 
       {/* Load More */}
       {hasMore && (
-        <div className="text-center pt-2">
+        <div className={styles.loadMoreWrapper}>
           <Button
             variant="outline"
             size="sm"
@@ -208,9 +208,9 @@ export function AuditLogViewer({
             onClick={loadMore}
           >
             {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className={`${styles.chevronIcon} animate-spin`} />
             ) : (
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className={styles.chevronIcon} />
             )}
             טען עוד
           </Button>
@@ -227,19 +227,19 @@ function AuditLogDetails({ log }: { log: AuditLog }) {
   const hasNew = newVal && typeof newVal === "object" && Object.keys(newVal).length > 0;
 
   return (
-    <div className="mt-3 pt-3 border-t space-y-2">
-      <div className="text-xs text-muted-foreground">
-        <LtrText className="font-mono text-[10px]">
+    <div className={styles.detailsSection}>
+      <div className={`body-small-regular ${styles.entityId}`}>
+        <LtrText className={`body-tiny-regular ${styles.entityIdMono}`}>
           Entity ID: {log.entityId}
         </LtrText>
       </div>
       {hasOld && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground mb-1">
+          <p className={`body-small-semibold ${styles.detailLabel}`}>
             ערך קודם:
           </p>
           <LtrText>
-            <pre className="text-xs bg-muted/50 p-2 rounded-md overflow-x-auto">
+            <pre className={styles.codeBlock}>
               {JSON.stringify(oldVal, null, 2)}
             </pre>
           </LtrText>
@@ -247,11 +247,11 @@ function AuditLogDetails({ log }: { log: AuditLog }) {
       )}
       {hasNew && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground mb-1">
+          <p className={`body-small-semibold ${styles.detailLabel}`}>
             ערך חדש:
           </p>
           <LtrText>
-            <pre className="text-xs bg-muted/50 p-2 rounded-md overflow-x-auto">
+            <pre className={styles.codeBlock}>
               {JSON.stringify(newVal, null, 2)}
             </pre>
           </LtrText>
@@ -260,3 +260,5 @@ function AuditLogDetails({ log }: { log: AuditLog }) {
     </div>
   );
 }
+
+export default AuditLogViewer;

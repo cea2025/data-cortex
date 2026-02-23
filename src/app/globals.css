@@ -64,8 +64,14 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ──────────────────────────────────────────────────
+   Design System Tokens
+   ────────────────────────────────────────────────── */
+
 :root {
   --radius: 0.625rem;
+
+  /* shadcn primitive colors */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -97,6 +103,77 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Surface tokens */
+  --surface-page: oklch(0.98 0 0);
+  --surface-primary-default: oklch(1 0 0);
+  --surface-primary-hover: oklch(0.97 0 0);
+  --surface-secondary-default: oklch(0.97 0.005 250);
+  --surface-overlay: oklch(0 0 0 / 40%);
+  --surface-brand: oklch(0.40 0.08 250);
+  --surface-brand-subtle: oklch(0.95 0.02 250);
+  --surface-success: oklch(0.95 0.03 149);
+  --surface-warning: oklch(0.95 0.04 85);
+  --surface-danger: oklch(0.95 0.04 27);
+  --surface-teal: oklch(0.95 0.03 180);
+  --surface-teal-bold: oklch(0.60 0.12 180);
+  --surface-amber: oklch(0.95 0.04 85);
+  --surface-amber-bold: oklch(0.72 0.17 85);
+  --surface-violet: oklch(0.95 0.04 290);
+  --surface-violet-bold: oklch(0.50 0.18 290);
+
+  /* Font tokens */
+  --font-primary-default: oklch(0.15 0 0);
+  --font-primary-subtle: oklch(0.45 0 0);
+  --font-secondary-default: oklch(0.55 0 0);
+  --font-inverse: oklch(0.98 0 0);
+  --font-brand: oklch(0.35 0.08 250);
+  --font-success: oklch(0.40 0.12 149);
+  --font-warning: oklch(0.50 0.14 85);
+  --font-danger: oklch(0.50 0.18 27);
+  --font-teal: oklch(0.45 0.10 180);
+  --font-amber: oklch(0.50 0.14 85);
+  --font-violet: oklch(0.45 0.15 290);
+
+  /* Icon tokens */
+  --icon-primary-default: oklch(0.30 0 0);
+  --icon-secondary-default: oklch(0.55 0 0);
+  --icon-brand: oklch(0.40 0.08 250);
+  --icon-inverse: oklch(0.98 0 0);
+  --icon-success: oklch(0.50 0.15 149);
+  --icon-warning: oklch(0.55 0.16 85);
+  --icon-danger: oklch(0.55 0.20 27);
+  --icon-teal: oklch(0.50 0.12 180);
+  --icon-amber: oklch(0.55 0.15 85);
+  --icon-violet: oklch(0.50 0.18 290);
+
+  /* Border tokens */
+  --border-default: oklch(0.90 0 0);
+  --border-subtle: oklch(0.94 0 0);
+  --border-strong: oklch(0.80 0 0);
+  --border-brand: oklch(0.55 0.10 250);
+  --border-success: oklch(0.65 0.10 149);
+  --border-warning: oklch(0.70 0.12 85);
+  --border-danger: oklch(0.65 0.15 27);
+  --border-teal: oklch(0.65 0.08 180);
+  --border-amber: oklch(0.70 0.12 85);
+  --border-violet: oklch(0.65 0.12 290);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-small: 6px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
+  --radius-full: 9999px;
 }
 
 .dark {
@@ -131,4 +208,138 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Dark overrides for design tokens */
+  --surface-page: oklch(0.13 0 0);
+  --surface-primary-default: oklch(0.20 0 0);
+  --surface-primary-hover: oklch(0.25 0 0);
+  --surface-secondary-default: oklch(0.18 0.005 250);
+  --surface-overlay: oklch(0 0 0 / 60%);
+  --surface-brand: oklch(0.30 0.08 250);
+  --surface-brand-subtle: oklch(0.20 0.03 250);
+  --surface-success: oklch(0.20 0.04 149);
+  --surface-warning: oklch(0.20 0.04 85);
+  --surface-danger: oklch(0.20 0.04 27);
+  --surface-teal: oklch(0.20 0.03 180);
+  --surface-teal-bold: oklch(0.45 0.10 180);
+  --surface-amber: oklch(0.20 0.04 85);
+  --surface-amber-bold: oklch(0.55 0.14 85);
+  --surface-violet: oklch(0.20 0.04 290);
+  --surface-violet-bold: oklch(0.40 0.16 290);
+
+  --font-primary-default: oklch(0.95 0 0);
+  --font-primary-subtle: oklch(0.75 0 0);
+  --font-secondary-default: oklch(0.65 0 0);
+  --font-inverse: oklch(0.15 0 0);
+  --font-brand: oklch(0.70 0.08 250);
+  --font-success: oklch(0.70 0.12 149);
+  --font-warning: oklch(0.75 0.14 85);
+  --font-danger: oklch(0.70 0.18 27);
+  --font-teal: oklch(0.70 0.10 180);
+  --font-amber: oklch(0.75 0.14 85);
+  --font-violet: oklch(0.70 0.15 290);
+
+  --icon-primary-default: oklch(0.85 0 0);
+  --icon-secondary-default: oklch(0.65 0 0);
+  --icon-brand: oklch(0.65 0.08 250);
+  --icon-inverse: oklch(0.15 0 0);
+  --icon-success: oklch(0.65 0.15 149);
+  --icon-warning: oklch(0.70 0.16 85);
+  --icon-danger: oklch(0.70 0.20 27);
+  --icon-teal: oklch(0.65 0.12 180);
+  --icon-amber: oklch(0.70 0.15 85);
+  --icon-violet: oklch(0.65 0.18 290);
+
+  --border-default: oklch(1 0 0 / 12%);
+  --border-subtle: oklch(1 0 0 / 8%);
+  --border-strong: oklch(1 0 0 / 20%);
+  --border-brand: oklch(0.45 0.10 250);
+  --border-success: oklch(0.50 0.10 149);
+  --border-warning: oklch(0.55 0.12 85);
+  --border-danger: oklch(0.50 0.15 27);
+  --border-teal: oklch(0.50 0.08 180);
+  --border-amber: oklch(0.55 0.12 85);
+  --border-violet: oklch(0.50 0.12 290);
+}
+
+/* ──────────────────────────────────────────────────
+   Typography Classes
+   ────────────────────────────────────────────────── */
+
+.heading-h1-bold {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+}
+
+.heading-h2-bold {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+}
+
+.heading-h3-bold {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+}
+
+.body-large-regular {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+}
+
+.body-large-semibold {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+}
+
+.body-medium-regular {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+}
+
+.body-medium-semibold {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+}
+
+.body-small-regular {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 400;
+}
+
+.body-small-semibold {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+}
+
+.body-xsmall-bold {
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+  font-weight: 700;
+}
+
+.body-xsmall-regular {
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+  font-weight: 400;
+}
+
+.body-tiny-regular {
+  font-size: 0.625rem;
+  line-height: 0.75rem;
+  font-weight: 400;
+}
+
+.body-tiny-bold {
+  font-size: 0.625rem;
+  line-height: 0.75rem;
+  font-weight: 700;
 }

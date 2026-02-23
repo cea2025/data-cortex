@@ -24,7 +24,7 @@ import Link from "next/link";
 import { regenerateInsight } from "@/app/actions/ai";
 import { toast } from "sonner";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
-import { useOrgSlug } from "@/lib/org-context";
+import { useOrgSlug, useUserRole } from "@/lib/org-context";
 
 type AIInsight = AssetWithKnowledge["aiInsights"][number];
 
@@ -40,6 +40,7 @@ export function AIEvidencePanel({
   hasApprovedKnowledge,
 }: AIEvidencePanelProps) {
   const router = useRouter();
+  const { isAdmin } = useUserRole();
   const [isPending, startTransition] = useTransition();
 
   const handleRegenerate = () => {
@@ -68,7 +69,7 @@ export function AIEvidencePanel({
               : "תובנות AI ייווצרו כשיהיו פריטי ידע מאושרים"}
           </p>
         </div>
-        {hasApprovedKnowledge && (
+        {isAdmin && hasApprovedKnowledge && (
           <Button
             variant="outline"
             className="w-full gap-2 border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-700 dark:text-violet-400 dark:hover:bg-violet-950/30"
@@ -83,6 +84,11 @@ export function AIEvidencePanel({
             {isPending ? "מייצר תובנה..." : "צור תובנת AI"}
           </Button>
         )}
+        {!isAdmin && hasApprovedKnowledge && (
+          <p className="text-xs text-center text-muted-foreground">
+            יצירת תובנות AI זמינה למנהלים בלבד
+          </p>
+        )}
       </div>
     );
   }
@@ -93,7 +99,7 @@ export function AIEvidencePanel({
         <InsightCard key={insight.id} insight={insight} />
       ))}
 
-      {hasApprovedKnowledge && (
+      {isAdmin && hasApprovedKnowledge && (
         <Button
           variant="outline"
           size="sm"
