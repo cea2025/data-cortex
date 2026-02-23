@@ -1,5 +1,5 @@
-import { getTableAssets } from "@/app/actions/assets";
-import { DashboardContent } from "@/components/dashboard-content";
+import { getDashboardStats } from "@/app/actions/analytics";
+import { CoverageDashboard } from "@/components/coverage-dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +9,6 @@ export default async function DashboardPage({
   params: Promise<{ orgSlug: string }>;
 }) {
   const { orgSlug } = await params;
-  const tables = await getTableAssets(orgSlug);
-  return <DashboardContent tables={tables} />;
+  const stats = await getDashboardStats(orgSlug);
+  return <CoverageDashboard stats={stats} />;
 }
