@@ -52,9 +52,10 @@ export default async function DashboardLayout({
         <div className="hidden md:flex">
           <Sidebar />
         </div>
-        {/* Mobile navigation */}
-        <MobileNav />
-        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-navy-950 pb-20 md:pb-0">{children}</main>
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <MobileNav />
+          <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-navy-950 pb-20 md:pb-0">{children}</main>
+        </div>
         <Omnibar />
       </div>
     </OrgProvider>
