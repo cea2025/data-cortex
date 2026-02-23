@@ -7,6 +7,14 @@ export type KnowledgeItemType =
 export type KnowledgeStatus = "draft" | "review" | "approved" | "rejected";
 export type UserRole = "admin" | "owner" | "contributor" | "viewer";
 
+export interface Organization {
+  id: string;
+  slug: string;
+  name: string;
+  domainMappings: string[];
+  createdAt: string;
+}
+
 export interface SourceProvenance {
   addedBy: string;
   source: string;
@@ -27,6 +35,7 @@ export interface DataAssetWithRelations {
   rawMetadata: Record<string, unknown> | null;
   parentId: string | null;
   ownerId: string | null;
+  organizationId?: string | null;
   children?: DataAssetWithRelations[];
   knowledgeItems?: KnowledgeItemWithAuthor[];
   aiInsights?: AIInsightWithSources[];
@@ -47,6 +56,7 @@ export interface KnowledgeItemWithAuthor {
   dataAssetId: string;
   authorId: string;
   reviewerId: string | null;
+  organizationId?: string | null;
   author: UserProfileBasic;
   reviewer?: UserProfileBasic | null;
   createdAt: string;
@@ -59,6 +69,7 @@ export interface AIInsightWithSources {
   confidenceScore: number;
   modelVersion: string;
   dataAssetId: string;
+  organizationId?: string | null;
   sourceReferences: {
     knowledgeItem: KnowledgeItemWithAuthor;
   }[];
@@ -71,6 +82,8 @@ export interface UserProfileBasic {
   displayName: string;
   avatarUrl: string | null;
   role: UserRole;
+  isSuperAdmin: boolean;
+  organizationId?: string | null;
 }
 
 export interface AuditLogEntry {
@@ -81,6 +94,7 @@ export interface AuditLogEntry {
   oldValue: Record<string, unknown> | null;
   newValue: Record<string, unknown> | null;
   userId: string;
+  organizationId?: string | null;
   user: UserProfileBasic;
   createdAt: string;
 }

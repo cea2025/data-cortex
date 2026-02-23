@@ -1,9 +1,19 @@
-import { getTableAssets } from "@/app/actions/assets";
-import { DashboardContent } from "@/components/dashboard-content";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+export default async function RootPage() {
+  const user = await getCurrentUser();
 
-export default async function DashboardPage() {
-  const tables = await getTableAssets();
-  return <DashboardContent tables={tables} />;
+  if (!user) redirect("/login");
+
+  if (user.organizationId) {
+    const org = await prisma.organization.findUnique({
+      where: { id: user.organizationId },
+      select: { slug: true },
+    });
+    if (org) redirect(`/${org.slug}/`);
+  }
+
+  redirect("/login");
 }

@@ -18,17 +18,20 @@ import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/lib/store/ui-store";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
+import { useOrgSlug } from "@/lib/org-context";
+import { OrgSwitcher } from "@/components/org-switcher";
 
-const navLinks = [
-  { href: "/", icon: LayoutDashboard, label: "לוח בקרה" },
-  { href: "/contribute", icon: Plus, label: "הוסף ידע" },
-  { href: "/notifications", icon: Bell, label: "התראות" },
-  { href: "/audit", icon: History, label: "היסטוריה" },
+const navItems = [
+  { path: "", icon: LayoutDashboard, label: "לוח בקרה" },
+  { path: "/contribute", icon: Plus, label: "הוסף ידע" },
+  { path: "/notifications", icon: Bell, label: "התראות" },
+  { path: "/audit", icon: History, label: "היסטוריה" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const orgSlug = useOrgSlug();
   const { sidebarCollapsed, toggleSidebar, openSearch } = useUIStore();
 
   const handleSignOut = async () => {
@@ -54,6 +57,8 @@ export function Sidebar() {
         )}
       </div>
 
+      {!sidebarCollapsed && <OrgSwitcher />}
+
       <nav className="flex-1 p-2 space-y-1">
         <button
           onClick={openSearch}
@@ -73,10 +78,14 @@ export function Sidebar() {
           )}
         </button>
 
-        {navLinks.map((item) => {
-          const isActive = pathname === item.href;
+        {navItems.map((item) => {
+          const href = `/${orgSlug}${item.path}`;
+          const isActive =
+            item.path === ""
+              ? pathname === `/${orgSlug}` || pathname === `/${orgSlug}/`
+              : pathname.startsWith(href);
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.path} href={href}>
               <div
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",

@@ -6,6 +6,7 @@ interface AuditLogParams {
   entityId: string;
   entityType: string;
   action: string;
+  organizationId?: string | null;
   oldValue?: Record<string, unknown> | null;
   newValue?: Record<string, unknown> | null;
 }
@@ -17,6 +18,7 @@ export async function createAuditLog(params: AuditLogParams) {
       entityId: params.entityId,
       entityType: params.entityType,
       action: params.action,
+      organizationId: params.organizationId ?? null,
       oldValue: (params.oldValue ?? Prisma.JsonNull) as Prisma.InputJsonValue,
       newValue: (params.newValue ?? Prisma.JsonNull) as Prisma.InputJsonValue,
     },

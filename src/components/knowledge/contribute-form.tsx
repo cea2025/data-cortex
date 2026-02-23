@@ -17,6 +17,7 @@ import {
 import { LtrText } from "@/components/ltr-text";
 import { submitKnowledgeDraft } from "@/app/actions/knowledge";
 import { KNOWLEDGE_TYPE_LABELS } from "@/types/domain";
+import { useOrgSlug } from "@/lib/org-context";
 import { toast } from "sonner";
 import { Send, Loader2 } from "lucide-react";
 
@@ -76,6 +77,7 @@ export function ContributeForm({
   onSuccess,
 }: ContributeFormProps) {
   const router = useRouter();
+  const orgSlug = useOrgSlug();
   const [isPending, startTransition] = useTransition();
 
   const [selectedTable, setSelectedTable] = useState(fixedAssetId ?? "");
@@ -119,12 +121,13 @@ export function ContributeForm({
           itemType: result.data.itemType,
           contentHebrew: result.data.contentHebrew,
           contentEnglish: result.data.contentEnglish,
+          orgSlug,
         });
         toast.success("פריט הידע נשלח לבדיקה בהצלחה");
         if (onSuccess) {
           onSuccess();
         } else {
-          router.push(`/assets/${result.data.dataAssetId}`);
+          router.push(`/${orgSlug}/assets/${result.data.dataAssetId}`);
         }
       } catch {
         toast.error("שגיאה ביצירת פריט הידע");

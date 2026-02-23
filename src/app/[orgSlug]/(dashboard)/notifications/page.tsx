@@ -6,11 +6,16 @@ import { ReviewDashboard } from "@/components/knowledge/review-dashboard";
 
 export const dynamic = "force-dynamic";
 
-export default async function NotificationsPage() {
+export default async function NotificationsPage({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>;
+}) {
+  const { orgSlug } = await params;
   const user = await getCurrentUser();
 
   const [pendingItems, notifications] = await Promise.all([
-    getPendingReviews(),
+    getPendingReviews(orgSlug),
     user
       ? prisma.notification.findMany({
           where: { userId: user.id },

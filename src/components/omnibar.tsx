@@ -31,6 +31,7 @@ import {
   type SearchResult,
 } from "@/app/actions/search";
 import { useUIStore } from "@/lib/store/ui-store";
+import { useOrgSlug } from "@/lib/org-context";
 import {
   ASSET_TYPE_LABELS,
   KNOWLEDGE_TYPE_LABELS,
@@ -61,6 +62,7 @@ function isKnowledgeResult(r: SearchResult): r is KnowledgeSearchResult {
 
 export function Omnibar() {
   const { isSearchOpen, setSearchOpen, closeSearch } = useUIStore();
+  const orgSlug = useOrgSlug();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -91,7 +93,7 @@ export function Omnibar() {
     }
     const debounce = setTimeout(() => {
       startTransition(async () => {
-        const data = await searchAssetsAndKnowledge(query);
+        const data = await searchAssetsAndKnowledge(query, orgSlug);
         setResults(data);
       });
     }, 200);
@@ -100,10 +102,10 @@ export function Omnibar() {
 
   const navigateToAsset = useCallback(
     (assetId: string) => {
-      router.push(`/assets/${assetId}`);
+      router.push(`/${orgSlug}/assets/${assetId}`);
       closeSearch();
     },
-    [router, closeSearch]
+    [router, closeSearch, orgSlug]
   );
 
   const assetResults = results.filter(isAssetResult);

@@ -1,10 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { resolveOrgId } from "@/lib/org";
 
-export async function getAssetById(id: string) {
-  return prisma.dataAsset.findUnique({
-    where: { id },
+export async function getAssetById(id: string, orgSlug?: string) {
+  const orgFilter = orgSlug ? { organizationId: await resolveOrgId(orgSlug) } : {};
+  return prisma.dataAsset.findFirst({
+    where: { id, ...orgFilter },
     include: {
       owner: true,
       parent: true,
@@ -34,9 +36,10 @@ export async function getAssetById(id: string) {
   });
 }
 
-export async function getAssetWithKnowledge(id: string) {
-  const asset = await prisma.dataAsset.findUnique({
-    where: { id },
+export async function getAssetWithKnowledge(id: string, orgSlug?: string) {
+  const orgFilter = orgSlug ? { organizationId: await resolveOrgId(orgSlug) } : {};
+  const asset = await prisma.dataAsset.findFirst({
+    where: { id, ...orgFilter },
     include: {
       owner: true,
       parent: true,
@@ -94,9 +97,10 @@ export type AssetWithKnowledge = NonNullable<
   Awaited<ReturnType<typeof getAssetWithKnowledge>>
 >;
 
-export async function getAssetTree() {
+export async function getAssetTree(orgSlug?: string) {
+  const orgFilter = orgSlug ? { organizationId: await resolveOrgId(orgSlug) } : {};
   const systems = await prisma.dataAsset.findMany({
-    where: { assetType: "system" },
+    where: { assetType: "system", ...orgFilter },
     include: {
       children: {
         where: { assetType: "schema" },
@@ -118,9 +122,10 @@ export async function getAssetTree() {
   return systems;
 }
 
-export async function getTableAssets() {
+export async function getTableAssets(orgSlug?: string) {
+  const orgFilter = orgSlug ? { organizationId: await resolveOrgId(orgSlug) } : {};
   return prisma.dataAsset.findMany({
-    where: { assetType: "table" },
+    where: { assetType: "table", ...orgFilter },
     include: {
       owner: true,
       children: {

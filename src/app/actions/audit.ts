@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { resolveOrgId } from "@/lib/org";
 
 interface AuditLogFilters {
   entityType?: string;
@@ -8,15 +9,17 @@ interface AuditLogFilters {
   userId?: string;
   limit?: number;
   offset?: number;
+  orgSlug?: string;
 }
 
 export async function getAuditLogs(filters: AuditLogFilters = {}) {
-  const { entityType, action, userId, limit = 50, offset = 0 } = filters;
+  const { entityType, action, userId, limit = 50, offset = 0, orgSlug } = filters;
 
   const where: Record<string, unknown> = {};
   if (entityType) where.entityType = entityType;
   if (action) where.action = { contains: action };
   if (userId) where.userId = userId;
+  if (orgSlug) where.organizationId = await resolveOrgId(orgSlug);
 
   const [logs, total] = await Promise.all([
     prisma.auditLog.findMany({
@@ -32,8 +35,12 @@ export async function getAuditLogs(filters: AuditLogFilters = {}) {
   return { logs, total };
 }
 
-export async function getAuditLogEntityTypes() {
+export async function getAuditLogEntityTypes(orgSlug?: string) {
+  const where: Record<string, unknown> = {};
+  if (orgSlug) where.organizationId = await resolveOrgId(orgSlug);
+
   const types = await prisma.auditLog.findMany({
+    where,
     select: { entityType: true },
     distinct: ["entityType"],
   });

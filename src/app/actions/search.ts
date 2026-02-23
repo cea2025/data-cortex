@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { resolveOrgId } from "@/lib/org";
 import type { AssetType, KnowledgeItemType } from "@/types/domain";
 
 export interface AssetSearchResult {
@@ -26,15 +27,18 @@ export interface KnowledgeSearchResult {
 export type SearchResult = AssetSearchResult | KnowledgeSearchResult;
 
 export async function searchAssetsAndKnowledge(
-  query: string
+  query: string,
+  orgSlug?: string
 ): Promise<SearchResult[]> {
   if (!query || query.length < 2) return [];
 
   const term = query.trim();
+  const orgFilter = orgSlug ? { organizationId: await resolveOrgId(orgSlug) } : {};
 
   const [assets, knowledgeItems] = await Promise.all([
     prisma.dataAsset.findMany({
       where: {
+        ...orgFilter,
         OR: [
           { systemName: { contains: term, mode: "insensitive" } },
           { schemaName: { contains: term, mode: "insensitive" } },
@@ -53,6 +57,7 @@ export async function searchAssetsAndKnowledge(
 
     prisma.knowledgeItem.findMany({
       where: {
+        ...orgFilter,
         OR: [
           { title: { contains: term, mode: "insensitive" } },
           { contentHebrew: { contains: term, mode: "insensitive" } },
@@ -113,12 +118,12 @@ export async function searchAssetsAndKnowledge(
 function extractSnippet(text: string, term: string, radius: number): string {
   const lower = text.toLowerCase();
   const idx = lower.indexOf(term.toLowerCase());
-  if (idx === -1) return text.slice(0, radius * 2) + (text.length > radius * 2 ? "…" : "");
+  if (idx === -1) return text.slice(0, radius * 2) + (text.length > radius * 2 ? "..." : "");
 
   const start = Math.max(0, idx - radius);
   const end = Math.min(text.length, idx + term.length + radius);
   let snippet = text.slice(start, end);
-  if (start > 0) snippet = "…" + snippet;
-  if (end < text.length) snippet = snippet + "…";
+  if (start > 0) snippet = "..." + snippet;
+  if (end < text.length) snippet = snippet + "...";
   return snippet;
 }

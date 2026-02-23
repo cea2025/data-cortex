@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LtrText } from "@/components/ltr-text";
 import { useUIStore } from "@/lib/store/ui-store";
+import { useOrgSlug } from "@/lib/org-context";
 import { ASSET_TYPE_LABELS } from "@/types/domain";
 
 interface TableAsset {
@@ -22,6 +23,7 @@ interface TableAsset {
 
 export function DashboardContent({ tables }: { tables: TableAsset[] }) {
   const { openSearch } = useUIStore();
+  const orgSlug = useOrgSlug();
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -94,7 +96,7 @@ export function DashboardContent({ tables }: { tables: TableAsset[] }) {
         <h2 className="text-xl font-semibold mb-4">טבלאות Tier-1</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {tables.map((table) => (
-            <Link key={table.id} href={`/assets/${table.id}`}>
+            <Link key={table.id} href={`/${orgSlug}/assets/${table.id}`}>
               <Card className="hover:border-primary/50 transition-colors cursor-pointer">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">

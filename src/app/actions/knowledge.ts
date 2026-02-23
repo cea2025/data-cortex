@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { createAuditLog } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
+import { resolveOrgId } from "@/lib/org";
 import type { KnowledgeItemType } from "@/generated/prisma/client";
 
-// ─── Submit Draft (status → "review") ───────────────────────────
+// ─── Submit Draft (status -> "review") ───────────────────────────
 
 interface SubmitDraftParams {
   dataAssetId: string;
@@ -14,10 +15,14 @@ interface SubmitDraftParams {
   itemType: KnowledgeItemType;
   contentHebrew?: string;
   contentEnglish?: string;
+  orgSlug?: string;
 }
 
 export async function submitKnowledgeDraft(params: SubmitDraftParams) {
   const user = await requireUser();
+  const organizationId = params.orgSlug
+    ? await resolveOrgId(params.orgSlug)
+    : user.organizationId;
 
   const item = await prisma.knowledgeItem.create({
     data: {
@@ -28,6 +33,7 @@ export async function submitKnowledgeDraft(params: SubmitDraftParams) {
       contentHebrew: params.contentHebrew,
       contentEnglish: params.contentEnglish,
       status: "review",
+      organizationId,
       sourceProvenance: {
         addedBy: user.id,
         source: "Manual Documentation",
@@ -41,6 +47,7 @@ export async function submitKnowledgeDraft(params: SubmitDraftParams) {
     entityId: item.id,
     entityType: "KnowledgeItem",
     action: "submit_draft",
+    organizationId,
     newValue: {
       title: item.title,
       itemType: item.itemType,
@@ -96,6 +103,7 @@ export async function updateKnowledgeStatus(
     entityId: itemId,
     entityType: "KnowledgeItem",
     action: `status_change_to_${newStatus}`,
+    organizationId: existing.organizationId,
     oldValue: { status: existing.status },
     newValue: { status: newStatus, reviewerId: user.id },
   });
@@ -144,9 +152,10 @@ export async function verifyKnowledgeItem(itemId: string) {
 
 // ─── Fetch Pending Reviews ──────────────────────────────────────
 
-export async function getPendingReviews() {
+export async function getPendingReviews(orgSlug?: string) {
+  const orgFilter = orgSlug ? { organizationId: await resolveOrgId(orgSlug) } : {};
   return prisma.knowledgeItem.findMany({
-    where: { status: "review" },
+    where: { status: "review", ...orgFilter },
     include: {
       author: true,
       dataAsset: {

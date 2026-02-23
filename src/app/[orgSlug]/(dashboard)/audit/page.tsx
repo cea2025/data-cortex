@@ -3,10 +3,15 @@ import { AuditLogViewer } from "@/components/audit/audit-log-viewer";
 
 export const dynamic = "force-dynamic";
 
-export default async function AuditPage() {
+export default async function AuditPage({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>;
+}) {
+  const { orgSlug } = await params;
   const [{ logs, total }, entityTypes] = await Promise.all([
-    getAuditLogs({ limit: 50 }),
-    getAuditLogEntityTypes(),
+    getAuditLogs({ limit: 50, orgSlug }),
+    getAuditLogEntityTypes(orgSlug),
   ]);
 
   return (

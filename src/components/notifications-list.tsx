@@ -11,6 +11,7 @@ import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
 } from "@/app/actions/notifications";
+import { useOrgSlug } from "@/lib/org-context";
 import { toast } from "sonner";
 
 interface Notification {
@@ -86,6 +87,7 @@ export function NotificationsList({
 
 function NotificationCard({ notification: notif }: { notification: Notification }) {
   const [isPending, startTransition] = useTransition();
+  const orgSlug = useOrgSlug();
 
   const handleClick = () => {
     if (!notif.read) {
@@ -149,8 +151,11 @@ function NotificationCard({ notification: notif }: { notification: Notification 
   );
 
   if (notif.link) {
+    const prefixedLink = notif.link.startsWith("/")
+      ? `/${orgSlug}${notif.link}`
+      : notif.link;
     return (
-      <Link href={notif.link} onClick={handleClick}>
+      <Link href={prefixedLink} onClick={handleClick}>
         {content}
       </Link>
     );

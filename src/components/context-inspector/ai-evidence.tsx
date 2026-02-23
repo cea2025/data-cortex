@@ -24,6 +24,7 @@ import Link from "next/link";
 import { regenerateInsight } from "@/app/actions/ai";
 import { toast } from "sonner";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
+import { useOrgSlug } from "@/lib/org-context";
 
 type AIInsight = AssetWithKnowledge["aiInsights"][number];
 
@@ -113,6 +114,7 @@ export function AIEvidencePanel({
 }
 
 function InsightCard({ insight }: { insight: AIInsight }) {
+  const orgSlug = useOrgSlug();
   const pct = Math.round(insight.confidenceScore * 100);
   const confidenceLevel =
     pct >= 80 ? "high" : pct >= 50 ? "medium" : "low";
@@ -193,7 +195,7 @@ function InsightCard({ insight }: { insight: AIInsight }) {
                 <Tooltip key={`${ref.knowledgeItem.id}-${idx}`}>
                   <TooltipTrigger asChild>
                     <Link
-                      href={`/assets/${ref.knowledgeItem.dataAssetId}`}
+                      href={`/${orgSlug}/assets/${ref.knowledgeItem.dataAssetId}`}
                       className="inline-flex items-center gap-1 text-xs bg-violet-100/60 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 rounded-md px-2 py-1 hover:bg-violet-200/80 dark:hover:bg-violet-900/50 transition-colors"
                     >
                       <span className="font-mono font-semibold">

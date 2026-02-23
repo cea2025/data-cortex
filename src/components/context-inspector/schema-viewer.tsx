@@ -26,6 +26,7 @@ import { LtrText } from "@/components/ltr-text";
 import { ASSET_TYPE_LABELS } from "@/types/domain";
 import type { AssetType } from "@/types/domain";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
+import { useOrgSlug } from "@/lib/org-context";
 import {
   getColumnConflictStatus,
   type ConflictStatus,
@@ -60,6 +61,7 @@ const conflictLabels: Record<ConflictStatus, string> = {
 };
 
 export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
+  const orgSlug = useOrgSlug();
   const TypeIcon = typeIcons[asset.assetType as AssetType] ?? Database;
 
   const childKnowledgeByAsset = useMemo(() => {
@@ -235,7 +237,7 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
                         </td>
                         <td className="px-3 py-2.5">
                           <Link
-                            href={`/assets/${col.id}`}
+                            href={`/${orgSlug}/assets/${col.id}`}
                             className="inline-flex items-center gap-1.5 text-primary hover:underline"
                           >
                             <LtrText className="font-mono text-xs font-medium">
@@ -279,7 +281,7 @@ export function SchemaViewer({ asset }: { asset: AssetWithKnowledge }) {
             <p className="text-xs text-muted-foreground" dir="rtl">
               חלק מ:{" "}
               <Link
-                href={`/assets/${asset.parent.id}`}
+                href={`/${orgSlug}/assets/${asset.parent.id}`}
                 className="text-primary hover:underline"
               >
                 <LtrText>

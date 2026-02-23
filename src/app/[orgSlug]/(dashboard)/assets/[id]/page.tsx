@@ -5,10 +5,10 @@ import { ContextInspector } from "@/components/context-inspector/context-inspect
 export default async function AssetPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ orgSlug: string; id: string }>;
 }) {
-  const { id } = await params;
-  const asset = await getAssetWithKnowledge(id);
+  const { orgSlug, id } = await params;
+  const asset = await getAssetWithKnowledge(id, orgSlug);
 
   if (!asset) notFound();
 

@@ -8,6 +8,7 @@ import { ReviewActions } from "./review-actions";
 import { KNOWLEDGE_TYPE_LABELS } from "@/types/domain";
 import type { KnowledgeItemType } from "@/types/domain";
 import type { PendingReviewItem } from "@/app/actions/knowledge";
+import { useOrgSlug } from "@/lib/org-context";
 import {
   ClipboardCheck,
   BookOpen,
@@ -26,6 +27,7 @@ const typeIcons: Record<KnowledgeItemType, typeof BookOpen> = {
 };
 
 export function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
+  const orgSlug = useOrgSlug();
   return (
     <div>
       <div className="flex items-center gap-3 mb-4">
@@ -102,7 +104,7 @@ export function ReviewDashboard({ items }: { items: PendingReviewItem[] }) {
                       {/* Meta row */}
                       <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                         <Link
-                          href={`/assets/${item.dataAsset.id}`}
+                          href={`/${orgSlug}/assets/${item.dataAsset.id}`}
                           className="inline-flex items-center gap-1 text-primary hover:underline"
                         >
                           <LtrText className="text-xs">{assetName}</LtrText>

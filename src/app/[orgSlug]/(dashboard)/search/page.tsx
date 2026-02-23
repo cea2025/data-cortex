@@ -26,6 +26,7 @@ import {
 } from "@/app/actions/search";
 import { ASSET_TYPE_LABELS, KNOWLEDGE_TYPE_LABELS } from "@/types/domain";
 import type { AssetType, KnowledgeItemType } from "@/types/domain";
+import { useOrgSlug } from "@/lib/org-context";
 
 const assetIcons: Record<string, typeof Database> = {
   system: Server,
@@ -51,6 +52,7 @@ function isKnowledge(r: SearchResult): r is KnowledgeSearchResult {
 
 export default function SearchPage() {
   const router = useRouter();
+  const orgSlug = useOrgSlug();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -62,7 +64,7 @@ export default function SearchPage() {
       return;
     }
     startTransition(async () => {
-      const data = await searchAssetsAndKnowledge(value);
+      const data = await searchAssetsAndKnowledge(value, orgSlug);
       setResults(data);
     });
   };
@@ -99,7 +101,7 @@ export default function SearchPage() {
               <Card
                 key={r.id}
                 className="cursor-pointer hover:border-primary/50 transition-colors"
-                onClick={() => router.push(`/assets/${r.id}`)}
+                onClick={() => router.push(`/${orgSlug}/assets/${r.id}`)}
               >
                 <CardContent className="p-4 flex items-start gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-muted/50 mt-0.5">
@@ -152,7 +154,7 @@ export default function SearchPage() {
               <Card
                 key={r.id}
                 className="cursor-pointer hover:border-amber-500/50 transition-colors"
-                onClick={() => router.push(`/assets/${r.assetId}`)}
+                onClick={() => router.push(`/${orgSlug}/assets/${r.assetId}`)}
               >
                 <CardContent className="p-4 flex items-start gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-500/10 mt-0.5">

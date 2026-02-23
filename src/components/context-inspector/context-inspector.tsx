@@ -23,6 +23,7 @@ import { LtrText } from "@/components/ltr-text";
 import { ASSET_TYPE_LABELS } from "@/types/domain";
 import type { AssetType } from "@/types/domain";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
+import { useOrgSlug } from "@/lib/org-context";
 
 const typeIcons: Record<AssetType, typeof Server> = {
   system: Server,
@@ -33,6 +34,7 @@ const typeIcons: Record<AssetType, typeof Server> = {
 
 export function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
   const { openSearch } = useUIStore();
+  const orgSlug = useOrgSlug();
   const TypeIcon = typeIcons[asset.assetType as AssetType] ?? Database;
   const displayName =
     asset.columnName ??
@@ -47,7 +49,7 @@ export function ContextInspector({ asset }: { asset: AssetWithKnowledge }) {
     <div className="flex flex-col h-full bg-background">
       {/* Header Bar */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm">
-        <Link href="/">
+        <Link href={`/${orgSlug}/`}>
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <ArrowRight className="h-4 w-4" />
           </Button>

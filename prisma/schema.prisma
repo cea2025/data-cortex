@@ -41,17 +41,41 @@ enum UserRole {
 }
 
 // ──────────────────────────────────────────────────
+// Organization (Multi-Tenant Root)
+// ──────────────────────────────────────────────────
+
+model Organization {
+  id             String   @id @default(uuid()) @db.Uuid
+  slug           String   @unique
+  name           String
+  domainMappings String[] @map("domain_mappings")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  users          UserProfile[]
+  dataAssets     DataAsset[]
+  knowledgeItems KnowledgeItem[]
+  aiInsights     AIInsight[]
+  auditLogs      AuditLog[]
+
+  @@map("organizations")
+}
+
+// ──────────────────────────────────────────────────
 // Core: UserProfile
 // ──────────────────────────────────────────────────
 
 model UserProfile {
-  id          String   @id @default(uuid()) @db.Uuid
-  email       String   @unique
-  displayName String   @map("display_name")
-  avatarUrl   String?  @map("avatar_url")
-  role        UserRole @default(viewer)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  displayName  String   @map("display_name")
+  avatarUrl    String?  @map("avatar_url")
+  role         UserRole @default(viewer)
+  isSuperAdmin Boolean  @default(false) @map("is_super_admin")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  organizationId String?       @map("organization_id") @db.Uuid
+  organization   Organization? @relation(fields: [organizationId], references: [id])
 
   ownedAssets     DataAsset[]     @relation("AssetOwner")
   knowledgeItems  KnowledgeItem[] @relation("KnowledgeAuthor")
@@ -59,6 +83,7 @@ model UserProfile {
   auditLogs       AuditLog[]
   notifications   Notification[]
 
+  @@index([organizationId])
   @@map("user_profiles")
 }
 
@@ -87,12 +112,16 @@ model DataAsset {
   ownerId String?      @map("owner_id") @db.Uuid
   owner   UserProfile? @relation("AssetOwner", fields: [ownerId], references: [id])
 
+  organizationId String?       @map("organization_id") @db.Uuid
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
   knowledgeItems KnowledgeItem[]
   aiInsights     AIInsight[]
 
-  @@unique([systemName, schemaName, tableName, columnName], name: "unique_asset_path")
+  @@unique([organizationId, systemName, schemaName, tableName, columnName], name: "unique_asset_path")
   @@index([assetType])
   @@index([systemName])
+  @@index([organizationId])
   @@map("data_assets")
 }
 
@@ -121,11 +150,15 @@ model KnowledgeItem {
   reviewerId String?      @map("reviewer_id") @db.Uuid
   reviewer   UserProfile? @relation("KnowledgeReviewer", fields: [reviewerId], references: [id])
 
+  organizationId String?       @map("organization_id") @db.Uuid
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
   referencedByInsights AIInsightSource[]
 
   @@index([dataAssetId])
   @@index([status])
   @@index([itemType])
+  @@index([organizationId])
   @@map("knowledge_items")
 }
 
@@ -143,9 +176,13 @@ model AIInsight {
   dataAssetId String    @map("data_asset_id") @db.Uuid
   dataAsset   DataAsset @relation(fields: [dataAssetId], references: [id], onDelete: Cascade)
 
+  organizationId String?       @map("organization_id") @db.Uuid
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
   sourceReferences AIInsightSource[]
 
   @@index([dataAssetId])
+  @@index([organizationId])
   @@map("ai_insights")
 }
 
@@ -176,10 +213,14 @@ model AuditLog {
   userId String      @map("user_id") @db.Uuid
   user   UserProfile @relation(fields: [userId], references: [id])
 
+  organizationId String?       @map("organization_id") @db.Uuid
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
   @@index([entityId])
   @@index([entityType])
   @@index([userId])
   @@index([createdAt])
+  @@index([organizationId])
   @@map("audit_logs")
 }
 
