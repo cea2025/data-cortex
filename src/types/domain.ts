@@ -86,6 +86,40 @@ export interface UserProfileBasic {
   organizationId?: string | null;
 }
 
+export type RelationshipType = "foreign_key" | "business_flow" | "calculated_from";
+
+export const RELATIONSHIP_TYPE_LABELS: Record<RelationshipType, string> = {
+  foreign_key: "מפתח זר",
+  business_flow: "זרימה עסקית",
+  calculated_from: "מחושב מ-",
+};
+
+export interface AssetRelationshipWithDetails {
+  id: string;
+  relationshipType: RelationshipType;
+  description: string | null;
+  sourceAssetId: string;
+  targetAssetId: string;
+  authorId: string;
+  organizationId: string;
+  createdAt: string;
+  sourceAsset: {
+    id: string;
+    assetType: AssetType;
+    systemName: string;
+    tableName: string | null;
+    columnName: string | null;
+  };
+  targetAsset: {
+    id: string;
+    assetType: AssetType;
+    systemName: string;
+    tableName: string | null;
+    columnName: string | null;
+  };
+  author: UserProfileBasic;
+}
+
 export interface AuditLogEntry {
   id: string;
   entityId: string;

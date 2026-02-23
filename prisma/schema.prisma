@@ -51,11 +51,12 @@ model Organization {
   domainMappings String[] @map("domain_mappings")
   createdAt      DateTime @default(now()) @map("created_at")
 
-  users          UserProfile[]
-  dataAssets     DataAsset[]
-  knowledgeItems KnowledgeItem[]
-  aiInsights     AIInsight[]
-  auditLogs      AuditLog[]
+  users              UserProfile[]
+  dataAssets         DataAsset[]
+  knowledgeItems     KnowledgeItem[]
+  aiInsights         AIInsight[]
+  auditLogs          AuditLog[]
+  assetRelationships AssetRelationship[]
 
   @@map("organizations")
 }
@@ -77,11 +78,12 @@ model UserProfile {
   organizationId String?       @map("organization_id") @db.Uuid
   organization   Organization? @relation(fields: [organizationId], references: [id])
 
-  ownedAssets     DataAsset[]     @relation("AssetOwner")
-  knowledgeItems  KnowledgeItem[] @relation("KnowledgeAuthor")
-  reviewedItems   KnowledgeItem[] @relation("KnowledgeReviewer")
-  auditLogs       AuditLog[]
-  notifications   Notification[]
+  ownedAssets         DataAsset[]         @relation("AssetOwner")
+  knowledgeItems     KnowledgeItem[]     @relation("KnowledgeAuthor")
+  reviewedItems      KnowledgeItem[]     @relation("KnowledgeReviewer")
+  auditLogs          AuditLog[]
+  notifications      Notification[]
+  assetRelationships AssetRelationship[]
 
   @@index([organizationId])
   @@map("user_profiles")
@@ -117,6 +119,9 @@ model DataAsset {
 
   knowledgeItems KnowledgeItem[]
   aiInsights     AIInsight[]
+
+  outgoingRelationships AssetRelationship[] @relation("RelationshipSource")
+  incomingRelationships AssetRelationship[] @relation("RelationshipTarget")
 
   @@unique([organizationId, systemName, schemaName, tableName, columnName], name: "unique_asset_path")
   @@index([assetType])
@@ -195,6 +200,35 @@ model AIInsightSource {
 
   @@id([insightId, knowledgeItemId])
   @@map("ai_insight_sources")
+}
+
+// ──────────────────────────────────────────────────
+// Core: AssetRelationship (Manual Lineage)
+// ──────────────────────────────────────────────────
+
+model AssetRelationship {
+  id               String   @id @default(uuid()) @db.Uuid
+  relationshipType String   @map("relationship_type")
+  description      String?
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  sourceAssetId String    @map("source_asset_id") @db.Uuid
+  sourceAsset   DataAsset @relation("RelationshipSource", fields: [sourceAssetId], references: [id], onDelete: Cascade)
+
+  targetAssetId String    @map("target_asset_id") @db.Uuid
+  targetAsset   DataAsset @relation("RelationshipTarget", fields: [targetAssetId], references: [id], onDelete: Cascade)
+
+  authorId String      @map("author_id") @db.Uuid
+  author   UserProfile @relation(fields: [authorId], references: [id])
+
+  organizationId String       @map("organization_id") @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([sourceAssetId, targetAssetId, relationshipType], name: "unique_relationship")
+  @@index([sourceAssetId])
+  @@index([targetAssetId])
+  @@index([organizationId])
+  @@map("asset_relationships")
 }
 
 // ──────────────────────────────────────────────────

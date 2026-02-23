@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { KnowledgeItemCard } from "@/components/knowledge/item-card";
 import { AIEvidencePanel } from "@/components/context-inspector/ai-evidence";
+import { RelationshipsTab } from "@/components/context-inspector/relationships-tab";
 import { ContributeForm } from "@/components/knowledge/contribute-form";
 import {
   BookOpen,
@@ -22,6 +23,7 @@ import {
   Ban,
   Cpu,
   Lightbulb,
+  ArrowLeftRight,
   Plus,
 } from "lucide-react";
 import type { AssetWithKnowledge } from "@/app/actions/assets";
@@ -29,6 +31,7 @@ import type { AssetWithKnowledge } from "@/app/actions/assets";
 export function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [topTab, setTopTab] = useState<"knowledge" | "relationships">("knowledge");
 
   const directItems = asset.knowledgeItems;
   const childItems = asset.childKnowledgeItems ?? [];
@@ -62,104 +65,141 @@ export function KnowledgeTabs({ asset }: { asset: AssetWithKnowledge }) {
 
   return (
     <div className="flex flex-col h-full border-r border-border" dir="rtl">
-      {/* Panel header */}
-      <div className="px-4 py-3 border-b border-border bg-muted/30">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-4 w-4 text-amber-500" />
-          <h2 className="text-sm font-semibold">ידע ארגוני</h2>
+      {/* Top-level section switcher */}
+      <div className="flex border-b border-border bg-card">
+        <button
+          onClick={() => setTopTab("knowledge")}
+          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 ${
+            topTab === "knowledge"
+              ? "border-primary text-primary bg-background"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Lightbulb className="h-3.5 w-3.5" />
+          ידע ארגוני
           {totalKnowledge > 0 && (
-            <span className="text-xs text-muted-foreground">
-              {totalKnowledge} פריטים
+            <span className="bg-muted rounded-full px-1.5 text-[10px] min-w-4 text-center">
+              {totalKnowledge}
             </span>
           )}
-          <Button
-            variant="default"
-            size="sm"
-            className="mr-auto gap-1.5 text-xs"
-            onClick={() => setSheetOpen(true)}
-          >
-            <Plus className="h-3.5 w-3.5" />
-            הוסף ידע
-          </Button>
-        </div>
+        </button>
+        <button
+          onClick={() => setTopTab("relationships")}
+          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 ${
+            topTab === "relationships"
+              ? "border-teal-500 text-teal-600 dark:text-teal-400 bg-background"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <ArrowLeftRight className="h-3.5 w-3.5" />
+          קשרי גומלין
+        </button>
       </div>
 
-      <Tabs defaultValue={defaultTab} className="flex flex-col flex-1 min-h-0">
-        <div className="border-b border-border px-3 pt-1 bg-card">
-          <TabsList className="w-full justify-start gap-0.5 bg-transparent h-auto p-0">
-            <TabButton value="business_rule" count={businessRules.length}>
-              <BookOpen className="h-3.5 w-3.5" />
-              כללים
-            </TabButton>
-            <TabButton value="warning" count={warnings.length}>
-              <AlertTriangle className="h-3.5 w-3.5" />
-              אזהרות
-            </TabButton>
-            <TabButton value="calculation" count={calculations.length}>
-              <Calculator className="h-3.5 w-3.5" />
-              חישובים
-            </TabButton>
-            <TabButton value="deprecation" count={deprecations.length}>
-              <Ban className="h-3.5 w-3.5" />
-              משומש
-            </TabButton>
-            <TabButton value="ai" count={asset.aiInsights.length}>
-              <Cpu className="h-3.5 w-3.5" />
-              AI
-            </TabButton>
-          </TabsList>
-        </div>
+      {topTab === "knowledge" ? (
+        <>
+          {/* Knowledge panel header */}
+          <div className="px-4 py-3 border-b border-border bg-muted/30">
+            <div className="flex items-center gap-2">
+              <Lightbulb className="h-4 w-4 text-amber-500" />
+              <h2 className="text-sm font-semibold">ידע ארגוני</h2>
+              {totalKnowledge > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {totalKnowledge} פריטים
+                </span>
+              )}
+              <Button
+                variant="default"
+                size="sm"
+                className="mr-auto gap-1.5 text-xs"
+                onClick={() => setSheetOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                הוסף ידע
+              </Button>
+            </div>
+          </div>
 
-        <ScrollArea className="flex-1">
-          <TabsContent value="business_rule" className="p-4 space-y-3 mt-0">
-            {businessRules.length === 0 ? (
-              <EmptyState icon={BookOpen} label="אין כללים עסקיים" />
-            ) : (
-              businessRules.map((item) => (
-                <KnowledgeItemCard key={item.id} item={item} />
-              ))
-            )}
-          </TabsContent>
+          <Tabs defaultValue={defaultTab} className="flex flex-col flex-1 min-h-0">
+            <div className="border-b border-border px-3 pt-1 bg-card">
+              <TabsList className="w-full justify-start gap-0.5 bg-transparent h-auto p-0">
+                <TabButton value="business_rule" count={businessRules.length}>
+                  <BookOpen className="h-3.5 w-3.5" />
+                  כללים
+                </TabButton>
+                <TabButton value="warning" count={warnings.length}>
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  אזהרות
+                </TabButton>
+                <TabButton value="calculation" count={calculations.length}>
+                  <Calculator className="h-3.5 w-3.5" />
+                  חישובים
+                </TabButton>
+                <TabButton value="deprecation" count={deprecations.length}>
+                  <Ban className="h-3.5 w-3.5" />
+                  משומש
+                </TabButton>
+                <TabButton value="ai" count={asset.aiInsights.length}>
+                  <Cpu className="h-3.5 w-3.5" />
+                  AI
+                </TabButton>
+              </TabsList>
+            </div>
 
-          <TabsContent value="warning" className="p-4 space-y-3 mt-0">
-            {warnings.length === 0 ? (
-              <EmptyState icon={AlertTriangle} label="אין אזהרות" />
-            ) : (
-              warnings.map((item) => (
-                <KnowledgeItemCard key={item.id} item={item} />
-              ))
-            )}
-          </TabsContent>
+            <ScrollArea className="flex-1">
+              <TabsContent value="business_rule" className="p-4 space-y-3 mt-0">
+                {businessRules.length === 0 ? (
+                  <EmptyState icon={BookOpen} label="אין כללים עסקיים" />
+                ) : (
+                  businessRules.map((item) => (
+                    <KnowledgeItemCard key={item.id} item={item} />
+                  ))
+                )}
+              </TabsContent>
 
-          <TabsContent value="calculation" className="p-4 space-y-3 mt-0">
-            {calculations.length === 0 ? (
-              <EmptyState icon={Calculator} label="אין לוגיקת חישוב" />
-            ) : (
-              calculations.map((item) => (
-                <KnowledgeItemCard key={item.id} item={item} />
-              ))
-            )}
-          </TabsContent>
+              <TabsContent value="warning" className="p-4 space-y-3 mt-0">
+                {warnings.length === 0 ? (
+                  <EmptyState icon={AlertTriangle} label="אין אזהרות" />
+                ) : (
+                  warnings.map((item) => (
+                    <KnowledgeItemCard key={item.id} item={item} />
+                  ))
+                )}
+              </TabsContent>
 
-          <TabsContent value="deprecation" className="p-4 space-y-3 mt-0">
-            {deprecations.length === 0 ? (
-              <EmptyState icon={Ban} label="אין פריטים שהוצאו משימוש" />
-            ) : (
-              deprecations.map((item) => (
-                <KnowledgeItemCard key={item.id} item={item} />
-              ))
-            )}
-          </TabsContent>
+              <TabsContent value="calculation" className="p-4 space-y-3 mt-0">
+                {calculations.length === 0 ? (
+                  <EmptyState icon={Calculator} label="אין לוגיקת חישוב" />
+                ) : (
+                  calculations.map((item) => (
+                    <KnowledgeItemCard key={item.id} item={item} />
+                  ))
+                )}
+              </TabsContent>
 
-          <TabsContent value="ai" className="p-4 space-y-3 mt-0">
-            <AIEvidencePanel
-              insights={asset.aiInsights}
-              assetId={asset.id}
-              hasApprovedKnowledge={allItems.some((i) => i.status === "approved")}
-            />
-          </TabsContent>
-        </ScrollArea>
-      </Tabs>
+              <TabsContent value="deprecation" className="p-4 space-y-3 mt-0">
+                {deprecations.length === 0 ? (
+                  <EmptyState icon={Ban} label="אין פריטים שהוצאו משימוש" />
+                ) : (
+                  deprecations.map((item) => (
+                    <KnowledgeItemCard key={item.id} item={item} />
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="ai" className="p-4 space-y-3 mt-0">
+                <AIEvidencePanel
+                  insights={asset.aiInsights}
+                  assetId={asset.id}
+                  hasApprovedKnowledge={allItems.some((i) => i.status === "approved")}
+                />
+              </TabsContent>
+            </ScrollArea>
+          </Tabs>
+        </>
+      ) : (
+        <RelationshipsTab assetId={asset.id} assetLabel={assetLabel} />
+      )}
 
       {/* Contribute Sheet */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
