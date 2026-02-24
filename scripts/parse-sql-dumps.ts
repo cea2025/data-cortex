@@ -3,15 +3,20 @@
  * Parses SQL Server DDL dumps from raw_sql_dumps/ and creates DataAsset records
  * for every system, schema, table, and column found.
  */
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config();
+dotenv.config({ path: ".env.local" });
 import * as fs from "fs";
 import * as path from "path";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
+const connectionString = process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"];
+if (!connectionString) throw new Error("DIRECT_URL or DATABASE_URL required");
 const pool = new pg.Pool({
-  connectionString: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
+  connectionString,
+  ssl: connectionString.includes("supabase") ? { rejectUnauthorized: process.env.NODE_ENV === "production" } : undefined,
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });

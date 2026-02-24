@@ -10,79 +10,87 @@ const SUPER_ADMIN_EMAILS = [
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const redirectBase = getRedirectBase(request, origin);
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        const email = user.email ?? "";
-        const domain = email.split("@")[1] ?? "";
-        const isPreApprovedSuperAdmin = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
-
-        let organizationId: string | null = null;
-        let orgSlug: string | null = null;
-
-        if (domain) {
-          const org = await prisma.organization.findFirst({
-            where: { domainMappings: { has: domain } },
-            select: { id: true, slug: true },
-          });
-          if (org) {
-            organizationId = org.id;
-            orgSlug = org.slug;
-          }
-        }
-
-        const profile = await prisma.userProfile.upsert({
-          where: { id: user.id },
-          update: {
-            email,
-            displayName:
-              user.user_metadata?.full_name ??
-              user.user_metadata?.name ??
-              email ??
-              "Unknown",
-            avatarUrl: user.user_metadata?.avatar_url ?? null,
-            ...(organizationId ? { organizationId } : {}),
-            ...(isPreApprovedSuperAdmin ? { isSuperAdmin: true, role: "admin", status: "ACTIVE" } : {}),
-          },
-          create: {
-            id: user.id,
-            email,
-            displayName:
-              user.user_metadata?.full_name ??
-              user.user_metadata?.name ??
-              email ??
-              "Unknown",
-            avatarUrl: user.user_metadata?.avatar_url ?? null,
-            role: isPreApprovedSuperAdmin ? "admin" : "viewer",
-            status: isPreApprovedSuperAdmin ? "ACTIVE" : "PENDING",
-            isSuperAdmin: isPreApprovedSuperAdmin,
-            organizationId,
-          },
-        });
-
-        const redirectBase = getRedirectBase(request, origin);
-
-        if (profile.status === "PENDING") {
-          return NextResponse.redirect(`${redirectBase}/pending`);
-        }
-        if (profile.status === "SUSPENDED") {
-          return NextResponse.redirect(`${redirectBase}/suspended`);
-        }
-
-        const redirectPath = orgSlug ? `/${orgSlug}/` : "/";
-        return NextResponse.redirect(`${redirectBase}${redirectPath}`);
+  try {
+    if (code) {
+      const supabase = await createClient();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        console.error("[auth/callback] exchangeCodeForSession", error.message, error.status);
+        return NextResponse.redirect(
+          `${redirectBase}/login?error=auth_failed&reason=${encodeURIComponent(error.message)}`
+        );
       }
-    }
-  }
+      const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-  return NextResponse.redirect(`${origin}/login?error=auth_failed`);
+        if (user) {
+          const email = user.email ?? "";
+          const domain = email.split("@")[1] ?? "";
+          const isPreApprovedSuperAdmin = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
+
+          let organizationId: string | null = null;
+          let orgSlug: string | null = null;
+
+          if (domain) {
+            const org = await prisma.organization.findFirst({
+              where: { domainMappings: { has: domain } },
+              select: { id: true, slug: true },
+            });
+            if (org) {
+              organizationId = org.id;
+              orgSlug = org.slug;
+            }
+          }
+
+          const profile = await prisma.userProfile.upsert({
+            where: { id: user.id },
+            update: {
+              email,
+              displayName:
+                user.user_metadata?.full_name ??
+                user.user_metadata?.name ??
+                email ??
+                "Unknown",
+              avatarUrl: user.user_metadata?.avatar_url ?? null,
+              ...(organizationId ? { organizationId } : {}),
+              ...(isPreApprovedSuperAdmin ? { isSuperAdmin: true, role: "admin", status: "ACTIVE" } : {}),
+            },
+            create: {
+              id: user.id,
+              email,
+              displayName:
+                user.user_metadata?.full_name ??
+                user.user_metadata?.name ??
+                email ??
+                "Unknown",
+              avatarUrl: user.user_metadata?.avatar_url ?? null,
+              role: isPreApprovedSuperAdmin ? "admin" : "viewer",
+              status: isPreApprovedSuperAdmin ? "ACTIVE" : "PENDING",
+              isSuperAdmin: isPreApprovedSuperAdmin,
+              organizationId,
+            },
+          });
+
+          if (profile.status === "PENDING") {
+            return NextResponse.redirect(`${redirectBase}/pending`);
+          }
+          if (profile.status === "SUSPENDED") {
+            return NextResponse.redirect(`${redirectBase}/suspended`);
+          }
+
+          const redirectPath = orgSlug ? `/${orgSlug}/` : "/";
+          return NextResponse.redirect(`${redirectBase}${redirectPath}`);
+        }
+    }
+
+    return NextResponse.redirect(`${redirectBase}/login?error=auth_failed`);
+  } catch (err) {
+    console.error("[auth/callback]", err);
+    return NextResponse.redirect(`${redirectBase}/login?error=callback_failed`);
+  }
 }
 
 function getRedirectBase(request: Request, origin: string): string {

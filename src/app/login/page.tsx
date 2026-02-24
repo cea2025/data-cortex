@@ -1,10 +1,15 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
+  const reason = searchParams.get("reason");
+
   const handleGoogleLogin = async () => {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
@@ -27,7 +32,22 @@ export default function LoginPage() {
             מנוע ממשל נתונים ואמון לבנקאות ליבה
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {error === "callback_failed" && (
+            <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+              הכניסה נכשלה (שגיאה בשרת). וודא שהגדרת ב-Vercel את משתני הסביבה של Supabase ו-DATABASE_URL, וב-Supabase הוספת את הכתובת data-cortex.vercel.app ל-Redirect URLs.
+            </p>
+          )}
+          {error === "auth_failed" && (
+            <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+              ההתחברות עם Google לא הושלמה. נסה שוב.
+              {reason && (
+                <span className="mt-2 block font-mono text-xs opacity-90">
+                  {reason}
+                </span>
+              )}
+            </p>
+          )}
           <Button
             onClick={handleGoogleLogin}
             variant="outline"
