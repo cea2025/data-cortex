@@ -10,61 +10,66 @@ const SUPER_ADMIN_EMAILS = [
 ];
 
 export async function getCurrentUser(): Promise<UserProfile | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) return null;
+    if (!user) return null;
 
-  const email = user.email ?? "";
-  const domain = email.split("@")[1] ?? "";
-  const isPreApprovedSuperAdmin = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
+    const email = user.email ?? "";
+    const domain = email.split("@")[1] ?? "";
+    const isPreApprovedSuperAdmin = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
 
-  let organizationId: string | undefined;
-  const existing = await prisma.userProfile.findUnique({
-    where: { id: user.id },
-    select: { organizationId: true },
-  });
-
-  if (!existing?.organizationId && domain) {
-    const org = await prisma.organization.findFirst({
-      where: { domainMappings: { has: domain } },
-      select: { id: true },
+    let organizationId: string | undefined;
+    const existing = await prisma.userProfile.findUnique({
+      where: { id: user.id },
+      select: { organizationId: true },
     });
-    if (org) organizationId = org.id;
+
+    if (!existing?.organizationId && domain) {
+      const org = await prisma.organization.findFirst({
+        where: { domainMappings: { has: domain } },
+        select: { id: true },
+      });
+      if (org) organizationId = org.id;
+    }
+
+    const profile = await prisma.userProfile.upsert({
+      where: { id: user.id },
+      update: {
+        email,
+        displayName:
+          user.user_metadata?.full_name ??
+          user.user_metadata?.name ??
+          email ??
+          "Unknown",
+        avatarUrl: user.user_metadata?.avatar_url ?? null,
+        ...(organizationId ? { organizationId } : {}),
+        ...(isPreApprovedSuperAdmin ? { isSuperAdmin: true, role: "admin", status: "ACTIVE" } : {}),
+      },
+      create: {
+        id: user.id,
+        email,
+        displayName:
+          user.user_metadata?.full_name ??
+          user.user_metadata?.name ??
+          email ??
+          "Unknown",
+        avatarUrl: user.user_metadata?.avatar_url ?? null,
+        role: isPreApprovedSuperAdmin ? "admin" : "viewer",
+        status: isPreApprovedSuperAdmin ? "ACTIVE" : "PENDING",
+        isSuperAdmin: isPreApprovedSuperAdmin,
+        organizationId: organizationId ?? null,
+      },
+    });
+
+    return profile;
+  } catch (err) {
+    console.error("[getCurrentUser]", err);
+    return null;
   }
-
-  const profile = await prisma.userProfile.upsert({
-    where: { id: user.id },
-    update: {
-      email,
-      displayName:
-        user.user_metadata?.full_name ??
-        user.user_metadata?.name ??
-        email ??
-        "Unknown",
-      avatarUrl: user.user_metadata?.avatar_url ?? null,
-      ...(organizationId ? { organizationId } : {}),
-      ...(isPreApprovedSuperAdmin ? { isSuperAdmin: true, role: "admin", status: "ACTIVE" } : {}),
-    },
-    create: {
-      id: user.id,
-      email,
-      displayName:
-        user.user_metadata?.full_name ??
-        user.user_metadata?.name ??
-        email ??
-        "Unknown",
-      avatarUrl: user.user_metadata?.avatar_url ?? null,
-      role: isPreApprovedSuperAdmin ? "admin" : "viewer",
-      status: isPreApprovedSuperAdmin ? "ACTIVE" : "PENDING",
-      isSuperAdmin: isPreApprovedSuperAdmin,
-      organizationId: organizationId ?? null,
-    },
-  });
-
-  return profile;
 }
 
 export async function requireUser(): Promise<UserProfile> {
