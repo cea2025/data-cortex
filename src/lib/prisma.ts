@@ -4,7 +4,13 @@ import pg from "pg";
 
 const connectionString = process.env.DATABASE_URL ?? process.env.DIRECT_URL;
 
-const pool = new pg.Pool({ connectionString });
+const pool = new pg.Pool({
+  connectionString,
+  ssl:
+    connectionString?.includes("supabase")
+      ? { rejectUnauthorized: process.env.NODE_ENV === "production" }
+      : undefined,
+});
 const adapter = new PrismaPg(pool);
 
 const globalForPrisma = globalThis as unknown as {

@@ -4,7 +4,7 @@
  * Run AFTER parse-sql-dumps.ts
  */
 import "dotenv/config";
-import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaClient, type KnowledgeItemType, type KnowledgeStatus } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
@@ -79,8 +79,8 @@ async function main() {
     system: string;
     table: string;
     column?: string;
-    itemType: string;
-    status: string;
+    itemType: KnowledgeItemType;
+    status: KnowledgeStatus;
     title: string;
     contentHebrew: string;
     contentEnglish?: string;

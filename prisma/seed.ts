@@ -1,10 +1,17 @@
 #!/usr/bin/env tsx
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config();
+dotenv.config({ path: ".env.local" });
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
-const pool = new pg.Pool({ connectionString: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"] });
+const connectionString = process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"];
+if (!connectionString) throw new Error("DIRECT_URL or DATABASE_URL required");
+const pool = new pg.Pool({
+  connectionString,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: true } : { rejectUnauthorized: false },
+});
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
